@@ -1,75 +1,109 @@
 import os
-os.environ['TK_SILENCE_DEPRECATION'] = '1'
-import sys
-print("Python version:", sys.version, flush=True)
-print("Current directory:", os.getcwd(), flush=True)
-
 from tkinter import *
 from tkinter import Tk, ttk
 from PIL import Image, ImageTk
 
 # Colors
+c0 = "#2e2d2b"  # black
 c1 = "#feffff"  # white
+c2 = "#4fa882"  # green
+c3 = "#38576b"  # value
 c4 = "#403d3d"  # letter
+c5 = "#e06636"  # profit
 c6 = "#038cfc"  # blue
-c9 = "#e9edf5"  # fallback background color
+c7 = "#3fbfb9"  # another green
+c8 = "#263238"  # another green
+c9 = "#e9edf5"  # another green
 
-# Create the main window
-print("Initializing Tkinter window...")
+colors = ["#5588bb", "#66bbbb", "#99bb55", "#ee9944", "#444466", "bb5555"]
+
+# Create a window
 janela = Tk()
-print("Tkinter window initialized successfully.")
 janela.title("Theme Test")
 janela.geometry("900x650")
 
 # Set theme
 style = ttk.Style()
+
+# Print available themes for debugging
+print("Available themes:", style.theme_names())
+
 try:
-    style.theme_use("clam")
+    style.theme_use("clam")  # Use a preferred theme
 except Exception as e:
     print(f"Error applying theme: {e}")
 
-# Theme background fallback
+# Use the background color from the current theme
 theme_background = style.lookup("TLabel", "background")
 if not theme_background:
-    theme_background = c9
+    theme_background = c9  # Fallback if theme background is not found
+
+# Verify theme background color
+print(f"Theme background color: {theme_background}")
+
+# Configure the main window's background color
 janela.configure(background=theme_background)
 
-# Frames
+# Frames (to structure the layout)
 frameUp = Frame(janela, width=900, height=50, bg=c1, relief="flat")
 frameUp.grid(row=0, column=0, sticky="ew")
 
-# Image and Label
-try:
-    app_img = Image.open('log.png').resize((45, 45))
-    app_img = ImageTk.PhotoImage(app_img)
-except FileNotFoundError:
-    print("Error: 'log.png' not found. Skipping image setup.")
-    app_img = None
-except Exception as e:
-    print(f"Error loading image: {e}")
-    app_img = None
+frameMiddle = Frame(janela, width=900, height=361, bg=c1, pady=20, relief="raised")
+frameMiddle.grid(row=1, column=0, pady=1, padx=0, sticky="nsew")
 
-if app_img:
+frameDown = Frame(janela, width=900, height=300, bg=c1, relief="flat")
+frameDown.grid(row=2, column=0, pady=1, padx=10, sticky="nsew")
+
+# Ensure layout configuration for frames
+janela.grid_rowconfigure(0, weight=1)
+janela.grid_rowconfigure(1, weight=1)
+janela.grid_rowconfigure(2, weight=1)
+janela.grid_columnconfigure(0, weight=1)
+
+# Add a button to the window
+button = ttk.Button(frameMiddle, text="Click Me")
+button.pack(pady=20)
+
+# Add a label to the window
+label = Label(frameMiddle, text="Hello, Tkinter!", bg=theme_background, font=("Arial", 16))
+label.pack()
+
+# Image and Label for app logo (inside frameUp)
+try:
+    app_img = Image.open('log.png').resize((45, 45))  # Make sure 'log.png' exists
+    app_img = ImageTk.PhotoImage(app_img)
     app_logo = Label(
         frameUp,
         image=app_img,
         text="  Personal budget",
+        width=900,
         compound=LEFT,
+        padx=5,
+        relief=RAISED,
+        anchor=NW,
         font=("Verdana", 20, "bold"),
         bg=c1,
         fg=c4
     )
-else:
+    app_logo.pack()  # Use pack for simplicity
+except FileNotFoundError:
+    print("Image 'log.png' not found. Skipping image setup.")
     app_logo = Label(
         frameUp,
-        text="  Personal budget (Image Missing)",
+        text="  Personal budget",
+        width=900,
+        padx=5,
+        relief=RAISED,
+        anchor=NW,
         font=("Verdana", 20, "bold"),
         bg=c1,
         fg=c4
     )
-app_logo.place(x=0, y=0)
+    app_logo.pack()  # Use pack for consistency
 
-# Main loop
+# Run the window
 print("Starting the main loop...")
+janela.update()  # Ensure the window updates after changes
 janela.mainloop()
 print("Main loop exited.")
+
