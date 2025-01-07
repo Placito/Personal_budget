@@ -1,7 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QPushButton, QFrame
-from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
 import os
 
 # Colors
@@ -22,7 +21,7 @@ class MyApp(QWidget):
 
         # Set up window
         self.setWindowTitle('PyQt Example')
-        self.setGeometry(100, 100, 300, 200)
+        self.setGeometry(100, 100, 800, 600)
         
         # Set theme (background color)
         self.setStyleSheet(f"background-color: {c9};")
@@ -49,30 +48,29 @@ class MyApp(QWidget):
         # Add content to the top frame (frame_up)
         try:
             img_path = os.path.join(os.path.dirname(__file__), "log.png")
-            app_img = QPixmap(img_path).scaled(45, 45)  # Load and resize the image
-            label_logo = QLabel(self)
-            label_logo.setPixmap(app_img)
-            label_logo.setText("  Personal budget")
-            label_logo.setStyleSheet(f"font: bold 20px Verdana; color: {c4};")
-            frame_up_layout = QVBoxLayout(frame_up)
-            frame_up_layout.addWidget(label_logo)
+            if os.path.exists(img_path):  # Ensure file exists
+                app_img = QPixmap(img_path).scaled(45, 45)  # Load and resize the image
+                if app_img.isNull():
+                    print("Error: Image could not be loaded.")
+                else:
+                    label_logo = QLabel(self)
+                    label_logo.setPixmap(app_img)
+                    label_logo.setText("  Personal budget management")
+                    label_logo.setStyleSheet(f"font: bold 20px Verdana; color: {c4};")
+                    frame_up_layout = QVBoxLayout(frame_up)
+                    frame_up_layout.addWidget(label_logo)
+            else:
+                raise FileNotFoundError
         except FileNotFoundError:
             print("Error: 'log.png' not found. Skipping image setup.")
-            label_logo = QLabel("  Personal budget", self)
+            label_logo = QLabel("  Personal budget management", self)
             label_logo.setStyleSheet(f"font: bold 20px Verdana; color: {c4};")
             frame_up_layout = QVBoxLayout(frame_up)
             frame_up_layout.addWidget(label_logo)
 
         # Add content to the middle frame (frame_middle)
-        button = QPushButton("Click Me", self)
-        button.setStyleSheet("background-color: #4fa882; color: white; font-size: 16px;")
         frame_middle_layout = QVBoxLayout(frame_middle)
-        frame_middle_layout.addWidget(button)
 
-        # Add a label to the middle frame (frame_middle)
-        label = QLabel("Hello, PyQt!", self)
-        label.setStyleSheet(f"font: 16px Arial; color: {c4}; background-color: {c9};")
-        frame_middle_layout.addWidget(label)
 
         # Show the window
         self.show()
