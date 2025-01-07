@@ -15,8 +15,6 @@ c7 = "#3fbfb9"  # another green
 c8 = "#263238"  # another green
 c9 = "#e9edf5"  # another green
 
-colors = ["#5588bb", "#66bbbb", "#99bb55", "#ee9944", "#444466", "bb5555"]
-
 # Create a window
 janela = Tk()
 janela.title("Theme Test")
@@ -24,22 +22,12 @@ janela.geometry("900x650")
 
 # Set theme
 style = ttk.Style()
-
-# Print available themes for debugging
-print("Available themes:", style.theme_names())
-
-try:
-    style.theme_use("clam")  # Use a preferred theme
-except Exception as e:
-    print(f"Error applying theme: {e}")
+style.theme_use("clam")  # Use a preferred theme
 
 # Use the background color from the current theme
 theme_background = style.lookup("TLabel", "background")
 if not theme_background:
     theme_background = c9  # Fallback if theme background is not found
-
-# Verify theme background color
-print(f"Theme background color: {theme_background}")
 
 # Configure the main window's background color
 janela.configure(background=theme_background)
@@ -62,16 +50,18 @@ janela.grid_columnconfigure(0, weight=1)
 
 # Add a button to the window
 button = ttk.Button(frameMiddle, text="Click Me")
-button.pack(pady=20)
+button.grid(row=1, column=0, pady=20)
 
 # Add a label to the window
 label = Label(frameMiddle, text="Hello, Tkinter!", bg=theme_background, font=("Arial", 16))
-label.pack()
+label.grid(row=2, column=0)
 
 # Image and Label for app logo (inside frameUp)
 try:
-    app_img = Image.open('log.png').resize((45, 45))  # Make sure 'log.png' exists
+    img_path = os.path.join(os.path.dirname(__file__), "log.png")
+    app_img = Image.open(img_path).resize((45, 45))  # Load and resize the image
     app_img = ImageTk.PhotoImage(app_img)
+
     app_logo = Label(
         frameUp,
         image=app_img,
@@ -85,9 +75,11 @@ try:
         bg=c1,
         fg=c4
     )
-    app_logo.pack()  # Use pack for simplicity
+    app_logo.image = app_img  # Keep a reference to the image
+    app_logo.grid(row=0, column=0, sticky="w")  # Position the image and text on the left side of the frame
+
 except FileNotFoundError:
-    print("Image 'log.png' not found. Skipping image setup.")
+    print("Error: 'log.png' not found. Skipping image setup.")
     app_logo = Label(
         frameUp,
         text="  Personal budget",
@@ -99,11 +91,15 @@ except FileNotFoundError:
         bg=c1,
         fg=c4
     )
-    app_logo.pack()  # Use pack for consistency
+    app_logo.grid(row=0, column=0, sticky="w")  # If no image, just display text
+
+# Debug output
+print(f"App logo text: {app_logo.cget('text')}")
+print(f"App logo background: {app_logo.cget('background')}")
+print(f"App logo image: {app_logo.cget('image')}")
 
 # Run the window
 print("Starting the main loop...")
 janela.update()  # Ensure the window updates after changes
 janela.mainloop()
 print("Main loop exited.")
-
