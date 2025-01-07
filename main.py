@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QPushButton, QFrame
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame
 from PyQt5.QtGui import QPixmap
 import os
 
@@ -21,7 +21,7 @@ class MyApp(QWidget):
 
         # Set up window
         self.setWindowTitle('PyQt Example')
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(100, 0, 800, 600)
         
         # Set theme (background color)
         self.setStyleSheet(f"background-color: {c9};")
@@ -29,36 +29,35 @@ class MyApp(QWidget):
         # Create a layout
         layout = QVBoxLayout(self)
 
-        # Create Frames
+        # Create Frame up
         frame_up = QFrame(self)
-        frame_up.setStyleSheet(f"background-color: {c1};")
-        frame_up.setFixedHeight(50)
+        frame_up.setStyleSheet(f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;")
+        frame_up.setFixedHeight(100)
         layout.addWidget(frame_up)
-
-        frame_middle = QFrame(self)
-        frame_middle.setStyleSheet(f"background-color: {c1};")
-        frame_middle.setFixedHeight(100)
-        layout.addWidget(frame_middle)
-
-        frame_down = QFrame(self)
-        frame_down.setStyleSheet(f"background-color: {c1};")
-        frame_down.setFixedHeight(100)
-        layout.addWidget(frame_down)
 
         # Add content to the top frame (frame_up)
         try:
             img_path = os.path.join(os.path.dirname(__file__), "log.png")
-            if os.path.exists(img_path):  # Ensure file exists
+            print(f"Image path: {img_path}")  # Debugging info
+            if os.path.exists(img_path):
                 app_img = QPixmap(img_path).scaled(45, 45)  # Load and resize the image
                 if app_img.isNull():
                     print("Error: Image could not be loaded.")
                 else:
+                    # Create QLabel for image and text
                     label_logo = QLabel(self)
                     label_logo.setPixmap(app_img)
-                    label_logo.setText("  Personal budget management")
-                    label_logo.setStyleSheet(f"font: bold 20px Verdana; color: {c4};")
-                    frame_up_layout = QVBoxLayout(frame_up)
+                    label_logo.setStyleSheet(f"border: none;")
+                    
+                    label_text = QLabel("Personal Budget Management", self)
+                    label_text.setStyleSheet(f"font: bold 20px Verdana; color: {c4}; border: none;")
+                    
+                    # Create a horizontal layout for image and text
+                    frame_up_layout = QHBoxLayout(frame_up)
                     frame_up_layout.addWidget(label_logo)
+                    frame_up_layout.addWidget(label_text)
+                    frame_up_layout.setSpacing(10)  # Add spacing between logo and text
+                    frame_up_layout.addStretch()  # Push content to the left
             else:
                 raise FileNotFoundError
         except FileNotFoundError:
@@ -68,9 +67,17 @@ class MyApp(QWidget):
             frame_up_layout = QVBoxLayout(frame_up)
             frame_up_layout.addWidget(label_logo)
 
-        # Add content to the middle frame (frame_middle)
-        frame_middle_layout = QVBoxLayout(frame_middle)
-
+        # Create Frame middle
+        frame_middle = QFrame(self)
+        frame_middle.setStyleSheet(f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;")
+        frame_middle.setFixedHeight(100)
+        layout.addWidget(frame_middle)
+        
+        # Create Frame down
+        frame_down = QFrame(self)
+        frame_down.setStyleSheet(f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;")
+        frame_down.setFixedHeight(300)
+        layout.addWidget(frame_down)
 
         # Show the window
         self.show()
