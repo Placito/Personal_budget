@@ -1,7 +1,8 @@
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QPushButton, QFrame
+from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtCore import Qt
 import os
-from tkinter import *
-from tkinter import Tk, ttk
-from PIL import Image, ImageTk
 
 # Colors
 c0 = "#2e2d2b"  # black
@@ -15,91 +16,68 @@ c7 = "#3fbfb9"  # another green
 c8 = "#263238"  # another green
 c9 = "#e9edf5"  # another green
 
-# Create a window
-janela = Tk()
-janela.title("Theme Test")
-janela.geometry("900x650")
+class MyApp(QWidget):
+    def __init__(self):
+        super().__init__()
 
-# Set theme
-style = ttk.Style()
-style.theme_use("clam")  # Use a preferred theme
+        # Set up window
+        self.setWindowTitle('PyQt Example')
+        self.setGeometry(100, 100, 300, 200)
+        
+        # Set theme (background color)
+        self.setStyleSheet(f"background-color: {c9};")
 
-# Use the background color from the current theme
-theme_background = style.lookup("TLabel", "background")
-if not theme_background:
-    theme_background = c9  # Fallback if theme background is not found
+        # Create a layout
+        layout = QVBoxLayout(self)
 
-# Configure the main window's background color
-janela.configure(background=theme_background)
+        # Create Frames
+        frame_up = QFrame(self)
+        frame_up.setStyleSheet(f"background-color: {c1};")
+        frame_up.setFixedHeight(50)
+        layout.addWidget(frame_up)
 
-# Frames (to structure the layout)
-frameUp = Frame(janela, width=900, height=50, bg=c1, relief="flat")
-frameUp.grid(row=0, column=0, sticky="ew")
+        frame_middle = QFrame(self)
+        frame_middle.setStyleSheet(f"background-color: {c1};")
+        frame_middle.setFixedHeight(100)
+        layout.addWidget(frame_middle)
 
-frameMiddle = Frame(janela, width=900, height=361, bg=c1, pady=20, relief="raised")
-frameMiddle.grid(row=1, column=0, pady=1, padx=0, sticky="nsew")
+        frame_down = QFrame(self)
+        frame_down.setStyleSheet(f"background-color: {c1};")
+        frame_down.setFixedHeight(100)
+        layout.addWidget(frame_down)
 
-frameDown = Frame(janela, width=900, height=300, bg=c1, relief="flat")
-frameDown.grid(row=2, column=0, pady=1, padx=10, sticky="nsew")
+        # Add content to the top frame (frame_up)
+        try:
+            img_path = os.path.join(os.path.dirname(__file__), "log.png")
+            app_img = QPixmap(img_path).scaled(45, 45)  # Load and resize the image
+            label_logo = QLabel(self)
+            label_logo.setPixmap(app_img)
+            label_logo.setText("  Personal budget")
+            label_logo.setStyleSheet(f"font: bold 20px Verdana; color: {c4};")
+            frame_up_layout = QVBoxLayout(frame_up)
+            frame_up_layout.addWidget(label_logo)
+        except FileNotFoundError:
+            print("Error: 'log.png' not found. Skipping image setup.")
+            label_logo = QLabel("  Personal budget", self)
+            label_logo.setStyleSheet(f"font: bold 20px Verdana; color: {c4};")
+            frame_up_layout = QVBoxLayout(frame_up)
+            frame_up_layout.addWidget(label_logo)
 
-# Ensure layout configuration for frames
-janela.grid_rowconfigure(0, weight=1)
-janela.grid_rowconfigure(1, weight=1)
-janela.grid_rowconfigure(2, weight=1)
-janela.grid_columnconfigure(0, weight=1)
+        # Add content to the middle frame (frame_middle)
+        button = QPushButton("Click Me", self)
+        button.setStyleSheet("background-color: #4fa882; color: white; font-size: 16px;")
+        frame_middle_layout = QVBoxLayout(frame_middle)
+        frame_middle_layout.addWidget(button)
 
-# Add a button to the window
-button = ttk.Button(frameMiddle, text="Click Me")
-button.grid(row=1, column=0, pady=20)
+        # Add a label to the middle frame (frame_middle)
+        label = QLabel("Hello, PyQt!", self)
+        label.setStyleSheet(f"font: 16px Arial; color: {c4}; background-color: {c9};")
+        frame_middle_layout.addWidget(label)
 
-# Add a label to the window
-label = Label(frameMiddle, text="Hello, Tkinter!", bg=theme_background, font=("Arial", 16))
-label.grid(row=2, column=0)
+        # Show the window
+        self.show()
 
-# Image and Label for app logo (inside frameUp)
-try:
-    img_path = os.path.join(os.path.dirname(__file__), "log.png")
-    app_img = Image.open(img_path).resize((45, 45))  # Load and resize the image
-    app_img = ImageTk.PhotoImage(app_img)
-
-    app_logo = Label(
-        frameUp,
-        image=app_img,
-        text="  Personal budget",
-        width=900,
-        compound=LEFT,
-        padx=5,
-        relief=RAISED,
-        anchor=NW,
-        font=("Verdana", 20, "bold"),
-        bg=c1,
-        fg=c4
-    )
-    app_logo.image = app_img  # Keep a reference to the image
-    app_logo.grid(row=0, column=0, sticky="w")  # Position the image and text on the left side of the frame
-
-except FileNotFoundError:
-    print("Error: 'log.png' not found. Skipping image setup.")
-    app_logo = Label(
-        frameUp,
-        text="  Personal budget",
-        width=900,
-        padx=5,
-        relief=RAISED,
-        anchor=NW,
-        font=("Verdana", 20, "bold"),
-        bg=c1,
-        fg=c4
-    )
-    app_logo.grid(row=0, column=0, sticky="w")  # If no image, just display text
-
-# Debug output
-print(f"App logo text: {app_logo.cget('text')}")
-print(f"App logo background: {app_logo.cget('background')}")
-print(f"App logo image: {app_logo.cget('image')}")
-
-# Run the window
-print("Starting the main loop...")
-janela.update()  # Ensure the window updates after changes
-janela.mainloop()
-print("Main loop exited.")
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MyApp()
+    sys.exit(app.exec_())
