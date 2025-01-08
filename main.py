@@ -17,7 +17,6 @@ c7 = "#3fbfb9"  # another green
 c8 = "#263238"  # another green
 c9 = "#e9edf5"  # another green
 
-
 class MyApp(QWidget):
     def __init__(self):
         super().__init__()
@@ -71,14 +70,19 @@ class MyApp(QWidget):
         # Frame middle
         frame_middle = QFrame(self)
         frame_middle.setStyleSheet(
-            f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;"
+            f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;"  
         )
         frame_middle.setFixedHeight(300)
         layout.addWidget(frame_middle)
 
-        frame_middle_layout = QVBoxLayout(frame_middle)
-        frame_middle_layout.setContentsMargins(0, 0, 0, 0)
-        frame_middle_layout.setSpacing(0)
+        # Create the main layout for frame_middle (HBoxLayout)
+        frame_middle_layout = QHBoxLayout(frame_middle)
+
+        # Container for Progress Bar and Chart
+        progress_chart_container = QWidget(self)
+        progress_chart_container.setFixedWidth(200)
+        progress_chart_container.setStyleSheet("border: none;")
+        progress_chart_layout = QVBoxLayout(progress_chart_container)
 
         top_left_layout = QVBoxLayout()
         top_left_layout.setContentsMargins(10, 10, 10, 0)
@@ -88,6 +92,7 @@ class MyApp(QWidget):
         label_percentage.setStyleSheet(f"font: bold 10px Verdana; color: {c4}; border: none;")
         top_left_layout.addWidget(label_percentage)
 
+       # Progress Bar layout
         progress_layout = QHBoxLayout()
         progress_layout.setSpacing(10)
 
@@ -95,30 +100,35 @@ class MyApp(QWidget):
         bar.setRange(0, 100)
         bar.setValue(50)
         bar.setTextVisible(False)
-        bar.setFixedWidth(120)
+
+        # Set a simpler style for the progress bar
         bar.setStyleSheet(
             f"""
             QProgressBar {{
-                background-color: {c1};
-                border: 2px solid {c2};
-                border-radius: 5px;
-                color: {c0};
+                background-color: {c9};  /* Background color */
+                border: 1px solid {c0};  /* Border color */
+                border-radius: 5px;      /* Rounded corners */
             }}
             QProgressBar::chunk {{
-                background-color: {c7};
-                border-radius: 5px;
+                background-color: {c7};  /* Progress color */
+                border-radius: 5px;      /* Rounded corners for progress */
             }}
-        """
+            """
         )
-        progress_layout.addWidget(bar)
 
+        # Set the width and height of the progress bar
+        bar.setFixedWidth(120)  # Adjust as needed
+        bar.setFixedHeight(20)  # Adjust height to fit
+
+        # Add the progress bar and percentage label to the layout
         percentage_label = QLabel("50%", frame_middle)
         percentage_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0}; border: none;")
+        progress_layout.addWidget(bar)
         progress_layout.addWidget(percentage_label)
 
+        # Add this layout to the parent container layout
         top_left_layout.addLayout(progress_layout)
-        frame_middle_layout.addLayout(top_left_layout)
-        frame_middle_layout.addStretch()
+        progress_chart_layout.addLayout(top_left_layout)
 
         # Chart
         list_categories = ["Income", "Expenses", "Balance"]
@@ -138,7 +148,8 @@ class MyApp(QWidget):
                 ha="center",
             )
 
-        ax.set_xticklabels(list_categories, fontsize=10)
+        ax.set_xticks(range(len(list_categories)))  # Define tick positions
+        ax.set_xticklabels(list_categories, fontsize=10)  # Apply labels            
         ax.patch.set_facecolor(c1)
         ax.spines["bottom"].set_color(c3)
         ax.spines["bottom"].set_linewidth(1)
@@ -158,8 +169,53 @@ class MyApp(QWidget):
         canvas_layout = QVBoxLayout(canvas_container)
         canvas_layout.addWidget(canvas)
 
-        # Add the canvas container to the layout
-        frame_middle_layout.addWidget(canvas_container)
+        # Add the canvas container to the progress chart container
+        progress_chart_layout.addWidget(canvas_container)
+
+        # Container for the Totals
+        totals_container = QWidget(self)
+        totals_container.setFixedWidth(210)
+        totals_container.setFixedHeight(180)
+        totals_container.setStyleSheet("border: none;") 
+        totals_layout = QVBoxLayout(totals_container)
+
+        # Values to display
+        values = [500, 600, 420]
+
+        # Total Monthly Income
+        income_label = QLabel(f"Total Monthly Income".upper(), self)
+        income_label.setStyleSheet(f"font: bold 12px Verdana; color: #83a9e6; background-color: {c1}; border: none")
+        income_value_label = QLabel(f"€ {values[0]:,.2f}".upper(), self)
+        income_value_label.setStyleSheet(f"font: bold 17px Arial; color: #545454; background-color: {c1}; border-top: 1px solid {c0};")
+
+        # Total Monthly Expenses
+        expenses_label = QLabel(f"Total Monthly Expenses".upper(), self)
+        expenses_label.setStyleSheet(f"font: bold 12px Verdana; color: #83a9e6; background-color: {c1}; border: none")
+        expenses_value_label = QLabel(f"€ {values[1]:,.2f}".upper(), self)
+        expenses_value_label.setStyleSheet(f"font: bold 17px Arial; color: #545454; background-color: {c1}; border-top: 1px solid {c0};")
+
+        # Total Cash Balance
+        balance_label = QLabel(f"Total Cash Balance".upper(), self)
+        balance_label.setStyleSheet(f"font: bold 12px Verdana; color: #83a9e6; background-color: {c1}; border: none")
+        balance_value_label = QLabel(f"€ {values[2]:,.2f}".upper(), self)
+        balance_value_label.setStyleSheet(f"font: bold 17px Arial; color: #545454; background-color: {c1}; border-top: 1px solid {c0};")
+
+        # Add the labels and rows to the totals layout
+        totals_layout.addWidget(income_label)
+        totals_layout.addWidget(income_value_label)
+
+        totals_layout.addWidget(expenses_label)
+        totals_layout.addWidget(expenses_value_label)
+
+        totals_layout.addWidget(balance_label)
+        totals_layout.addWidget(balance_value_label)
+
+        # Add the totals container to the main layout
+        frame_middle_layout.addWidget(progress_chart_container)
+        frame_middle_layout.addWidget(totals_container)
+
+        # Set the window layout
+        self.setLayout(layout)
 
         # Frame down
         frame_down = QFrame(self)
