@@ -1,7 +1,10 @@
-import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame
-from PyQt5.QtGui import QPixmap
 import os
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QProgressBar, QPushButton
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt, QTimer
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+import matplotlib.pyplot as plt
 
 # Colors
 c0 = "#2e2d2b"  # black
@@ -9,7 +12,7 @@ c1 = "#feffff"  # white
 c2 = "#4fa882"  # green
 c3 = "#38576b"  # value
 c4 = "#403d3d"  # letter
-c5 = "#e06636"  # profit
+c5 = "#e06636"  # profit (orange)
 c6 = "#038cfc"  # blue
 c7 = "#3fbfb9"  # another green
 c8 = "#263238"  # another green
@@ -21,7 +24,7 @@ class MyApp(QWidget):
 
         # Set up window
         self.setWindowTitle('PyQt Example')
-        self.setGeometry(100, 0, 800, 600)
+        self.setGeometry(0, 0, 800, 600)
         
         # Set theme (background color)
         self.setStyleSheet(f"background-color: {c9};")
@@ -32,7 +35,7 @@ class MyApp(QWidget):
         # Create Frame up
         frame_up = QFrame(self)
         frame_up.setStyleSheet(f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;")
-        frame_up.setFixedHeight(100)
+        frame_up.setFixedHeight(80)
         layout.addWidget(frame_up)
 
         # Add content to the top frame (frame_up)
@@ -67,12 +70,49 @@ class MyApp(QWidget):
             frame_up_layout = QVBoxLayout(frame_up)
             frame_up_layout.addWidget(label_logo)
 
-        # Create Frame middle
+        # Frame middle
         frame_middle = QFrame(self)
         frame_middle.setStyleSheet(f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;")
-        frame_middle.setFixedHeight(100)
+        frame_middle.setFixedHeight(300)
         layout.addWidget(frame_middle)
-        
+
+        # Layouts for positioning
+        frame_middle_layout = QVBoxLayout(frame_middle)
+        frame_middle_layout.setContentsMargins(0, 0, 0, 0)  # Remove all margins
+        frame_middle_layout.setSpacing(0)  # Remove any extra spacing
+
+        # Container for label and progress bar
+        top_left_layout = QVBoxLayout()  # Vertical layout for the label and progress bar
+        top_left_layout.setContentsMargins(10, 10, 10, 0)  # Add padding from the top-left corner
+        top_left_layout.setSpacing(5)  # Spacing between the label and progress bar
+
+        # Label
+        label_percentage = QLabel("Percentage of income spent:", self)
+        label_percentage.setStyleSheet(f"font: bold 10px Verdana; color: {c4}; border: none;")
+        top_left_layout.addWidget(label_percentage)
+
+        # Progress bar
+        bar = QProgressBar(frame_middle)
+        bar.setRange(0, 100)  # Set range
+        bar.setValue(50)  # Set initial value
+        bar.setStyleSheet(f"""
+            QProgressBar {{
+                background-color: {c1};  /* Background color */
+                border: 2px solid {c2};  /* Border color */
+                border-radius: 5px;      /* Rounded corners */
+                width: 100px;
+            }}
+            QProgressBar::chunk {{
+                background-color: {c5};  /* Color of the filled portion (50% in this case) */
+                border-radius: 5px;      /* Make the chunk rounded */
+            }}
+        """)
+        top_left_layout.addWidget(bar)
+
+        # Add the top-left layout to the frame_middle_layout
+        frame_middle_layout.addLayout(top_left_layout)
+        frame_middle_layout.addStretch()  # Push remaining content down (if any)
+
         # Create Frame down
         frame_down = QFrame(self)
         frame_down.setStyleSheet(f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;")
