@@ -98,7 +98,7 @@ class MyApp(QWidget):
         # Progress bar
         bar = QProgressBar(frame_middle)
         bar.setRange(0, 100)  # Set range
-        bar.setValue(50)  # Example: Set value to 50%
+        bar.valueChanged.connect(lambda: percentage_label.setText(f"{bar.value()}%"))
         bar.setTextVisible(False)  # Hide the text inside the progress bar
         bar.setFixedWidth(120)  # Explicitly set the width of the progress bar
         bar.setStyleSheet(f"""
