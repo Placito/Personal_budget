@@ -91,23 +91,39 @@ class MyApp(QWidget):
         label_percentage.setStyleSheet(f"font: bold 10px Verdana; color: {c4}; border: none;")
         top_left_layout.addWidget(label_percentage)
 
+       # Layout for the progress bar and percentage label
+        progress_layout = QHBoxLayout()  # Horizontal layout for the bar and percentage
+        progress_layout.setSpacing(10)  # Add spacing between the bar and label
+
         # Progress bar
         bar = QProgressBar(frame_middle)
         bar.setRange(0, 100)  # Set range
-        bar.setValue(50)  # Set initial value
+        bar.setValue(50)  # Example: Set value to 50%
+        bar.setTextVisible(False)  # Hide the text inside the progress bar
+        bar.setFixedWidth(120)  # Explicitly set the width of the progress bar
         bar.setStyleSheet(f"""
             QProgressBar {{
                 background-color: {c1};  /* Background color */
                 border: 2px solid {c2};  /* Border color */
                 border-radius: 5px;      /* Rounded corners */
-                width: 100px;
+                text-align: center;      /* Align text in the center of the bar */
+                color: {c0};             /* Color of the text inside the bar */
             }}
             QProgressBar::chunk {{
-                background-color: {c5};  /* Color of the filled portion (50% in this case) */
-                border-radius: 5px;      /* Make the chunk rounded */
+                background-color: {c7};  /* Color of the filled portion (chunk) */
+                border-radius: 5px;      /* Rounded corners for the chunk */
             }}
         """)
-        top_left_layout.addWidget(bar)
+        progress_layout.addWidget(bar)  # Add the bar to the layout
+
+        # Percentage label
+        percentage_label = QLabel("50%", frame_middle)  # Display the value as text
+        percentage_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0}; border: none;")
+        progress_layout.addWidget(percentage_label)  # Add the label next to the bar
+
+        # Add the progress_layout to the main layout
+        top_left_layout.addLayout(progress_layout)
+
 
         # Add the top-left layout to the frame_middle_layout
         frame_middle_layout.addLayout(top_left_layout)
