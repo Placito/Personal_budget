@@ -25,7 +25,6 @@ class MyApp(QWidget):
         # Set up window
         self.setWindowTitle("PyQt Example")
         self.setGeometry(0, 0, 800, 600)
-
         # Set theme (background color)
         self.setStyleSheet(f"background-color: {c9};")
 
@@ -254,8 +253,40 @@ class MyApp(QWidget):
         frame_down.setFixedHeight(300)
         layout.addWidget(frame_down)
 
-        self.show()
+        frame_down_layout = QHBoxLayout(frame_down)
+        
+        # Container for the tables
+        tables_container = QWidget(self)
+        tables_container.setFixedWidth(300)
+        tables_container.setStyleSheet("border: none;") 
+        tables_layout = QVBoxLayout(tables_container)
 
+        # Add table label to the tables layout
+        table_label = QLabel(f"Income and Expense table:", self)
+        table_label.setStyleSheet(f"font: bold 12px Verdana; color: #83a9e6; background-color: {c1}; border: none")
+        tables_layout.addWidget(table_label)  # Add the label to the layout
+
+        # Set the layout for tables_container
+        tables_container.setLayout(tables_layout)
+
+        # Container for the CRUD
+        crud_container = QWidget(self)
+        crud_container.setFixedWidth(100)
+        crud_container.setStyleSheet("border: none;") 
+        crud_layout = QVBoxLayout(crud_container)
+
+        # Container for the expenses
+        expenses_container = QWidget(self)
+        expenses_container.setFixedWidth(100)
+        expenses_container.setStyleSheet("border: none;") 
+        expenses_layout = QVBoxLayout(expenses_container)
+
+        # Add layouts to frame_down
+        frame_down_layout.addWidget(tables_container)
+        frame_down_layout.addWidget(crud_container)
+        frame_down_layout.addWidget(expenses_container)
+
+        self.show()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
