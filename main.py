@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLay
 from PyQt5.QtGui import QPixmap
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Colors
 c0 = "#2e2d2b"  # black
@@ -132,10 +133,10 @@ class MyApp(QWidget):
 
         # Chart
         list_categories = ["Income", "Expenses", "Balance"]
-        list_values = [3000, 200, 6236]
+        list_values = [3000, 200, 6000]
         colors = [c2, c5, c6]
 
-        figure = plt.Figure(figsize=(4, 3.45), dpi=60)
+        figure = plt.Figure(figsize=(4, 4), dpi=60)
         ax = figure.add_subplot(111)
         ax.bar(list_categories, list_values, color=colors, width=0.9)
 
@@ -163,8 +164,7 @@ class MyApp(QWidget):
 
         # Wrap the canvas in a QWidget to apply margins
         canvas_container = QWidget(self)
-        canvas_container.setContentsMargins(5, 5, 5, 5)
-        canvas_container.setFixedWidth(180)
+        canvas_container.setFixedWidth(200)
         canvas_container.setStyleSheet("border: none;") 
         canvas_layout = QVBoxLayout(canvas_container)
         canvas_layout.addWidget(canvas)
@@ -174,7 +174,7 @@ class MyApp(QWidget):
 
         # Container for the Totals
         totals_container = QWidget(self)
-        totals_container.setFixedWidth(210)
+        totals_container.setFixedWidth(200)
         totals_container.setFixedHeight(180)
         totals_container.setStyleSheet("border: none;") 
         totals_layout = QVBoxLayout(totals_container)
@@ -210,12 +210,41 @@ class MyApp(QWidget):
         totals_layout.addWidget(balance_label)
         totals_layout.addWidget(balance_value_label)
 
-        # Add the totals container to the main layout
+        # Container for Donut Chart
+        circular_container = QWidget(self)
+        circular_container.setFixedWidth(500)
+        circular_container.setStyleSheet("border: none;") 
+        circular_layout = QVBoxLayout(circular_container)
+
+        # Donut Chart
+        chart_figure = plt.Figure(figsize=(3.5, 3), dpi=100)
+        chart_ax = chart_figure.add_subplot(111)
+
+        values = [345, 225, 534]
+        categories = ["Income", "Expenses", "Balance"]
+        colors = ["#4fa882", "#038cfc", "#e06636"]
+        explode = [0.05, 0.05, 0.05]
+
+        wedges, _, autotexts = chart_ax.pie(
+            values,
+            autopct="%1.1f%%",
+            colors=colors,
+            explode=explode,
+            startangle=90,
+            wedgeprops={"width": 0.4, "edgecolor": "white"},
+        )
+
+        chart_ax.legend(
+            wedges, categories, title="Categories:", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1)
+        )
+
+        chart_canvas = FigureCanvas(chart_figure)
+        circular_layout.addWidget(chart_canvas)
+
+        # Add layouts to frame_middle
         frame_middle_layout.addWidget(progress_chart_container)
         frame_middle_layout.addWidget(totals_container)
-
-        # Set the window layout
-        self.setLayout(layout)
+        frame_middle_layout.addWidget(circular_container)
 
         # Frame down
         frame_down = QFrame(self)
