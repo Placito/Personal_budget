@@ -1,6 +1,7 @@
 import os
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QProgressBar
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QProgressBar, QTableWidget, QTableWidgetItem, QScrollBar
 from PyQt5.QtGui import QPixmap
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
@@ -257,17 +258,65 @@ class MyApp(QWidget):
         
         # Container for the tables
         tables_container = QWidget(self)
-        tables_container.setFixedWidth(300)
-        tables_container.setStyleSheet("border: none;") 
+        tables_container.setFixedWidth(250)
+        tables_container.setStyleSheet("border: none;")
         tables_layout = QVBoxLayout(tables_container)
 
         # Add table label to the tables layout
         table_label = QLabel(f"Income and Expense table:", self)
-        table_label.setStyleSheet(f"font: bold 12px Verdana; color: #83a9e6; background-color: {c1}; border: none")
+        table_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0}; background-color: {c1}; border: none;")
         tables_layout.addWidget(table_label)  # Add the label to the layout
 
-        # Set the layout for tables_container
-        tables_container.setLayout(tables_layout)
+        # Create a QTableWidget for displaying the data
+        tabela_head = ['#Id', 'Categoria', 'Data', 'Quantia']
+        lista_itens = [[0, 2, 3, 4], [0, 2, 3, 4], [0, 2, 3, 4], [0, 2, 3, 4]]
+
+        table = QTableWidget(len(lista_itens), len(tabela_head), self)
+        table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        table.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+
+        # Set headers
+        table.setHorizontalHeaderLabels(tabela_head)
+
+        # Populate the table with data
+        for row_idx, row_data in enumerate(lista_itens):
+            for col_idx, col_data in enumerate(row_data):
+                item = QTableWidgetItem(str(col_data))
+                item.setTextAlignment(Qt.AlignCenter)  # Center-align text
+                table.setItem(row_idx, col_idx, item)
+
+        # Adjust column widths to fit the content
+        table.resizeColumnsToContents()
+
+        # Apply style to the table
+        table.setStyleSheet(
+            f"""
+            QTableWidget {{
+                background-color: {c9};  /* Background color */
+                alternate-background-color: {c1};  /* Alternate row background */
+                border: 1px solid {c2};  /* Border color */
+                color: black;  /* Text color */
+                font: 8px Verdana;
+            }}
+            QTableWidget::item {{
+                border: 1px solid {c3};  /* Item border */
+                padding: 5px;  /* Cell padding */
+            }}
+            QHeaderView::section {{
+                background-color: {c4};  /* Header background */
+                color: {c1};  /* Header text color */
+                font: 8px Verdana;
+                border: 1px solid {c2};  /* Header border */
+                padding: 4px;
+            }}
+            """
+        )
+
+        # Add table to the layout
+        tables_layout.addWidget(table)
+
+        # Set the layout for the container
+        self.setLayout(tables_layout)
 
         # Container for the CRUD
         crud_container = QWidget(self)
@@ -275,16 +324,32 @@ class MyApp(QWidget):
         crud_container.setStyleSheet("border: none;") 
         crud_layout = QVBoxLayout(crud_container)
 
-        # Container for the expenses
-        expenses_container = QWidget(self)
-        expenses_container.setFixedWidth(100)
-        expenses_container.setStyleSheet("border: none;") 
-        expenses_layout = QVBoxLayout(expenses_container)
+        # Add crud label to the cruds layout
+        crud_label = QLabel(f"Enter new expenses:", self)
+        crud_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0} background-color: {c1}; border: none")
+        crud_layout.addWidget(crud_label)  # Add the label to the layout
+        
+        # Set the layout for crud_container
+        crud_container.setLayout(crud_layout)
+
+        # Container for the configurations
+        configurations_container = QWidget(self)
+        configurations_container.setFixedWidth(100)
+        configurations_container.setStyleSheet("border: none;") 
+        configurations_layout = QVBoxLayout(configurations_container)
+
+         # Add configurations label to the configurations layout
+        configurations_label = QLabel(f"Enter new recipes:", self)
+        configurations_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0} background-color: {c1}; border: none")
+        configurations_layout.addWidget(configurations_label)  # Add the label to the layout
+
+        # Set the layout for configurations_container
+        configurations_container.setLayout(configurations_layout)
 
         # Add layouts to frame_down
         frame_down_layout.addWidget(tables_container)
         frame_down_layout.addWidget(crud_container)
-        frame_down_layout.addWidget(expenses_container)
+        frame_down_layout.addWidget(configurations_container)
 
         self.show()
 
