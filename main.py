@@ -1,7 +1,10 @@
 import os
 import sys
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QProgressBar, QTableWidget, QTableWidgetItem, QScrollBar
+from PyQt5.QtWidgets import (
+    QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame,
+    QProgressBar, QTableWidget, QTableWidgetItem
+)
 from PyQt5.QtGui import QPixmap
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
@@ -26,21 +29,34 @@ class MyApp(QWidget):
         # Set up window
         self.setWindowTitle("PyQt Example")
         self.setGeometry(0, 0, 800, 600)
-        # Set theme (background color)
         self.setStyleSheet(f"background-color: {c9};")
 
-        # Create a layout
+        # Create main layout
         layout = QVBoxLayout(self)
 
-        # Create Frame up
+        # Top Frame
+        frame_up = self.create_top_frame()
+        layout.addWidget(frame_up)
+
+        # Middle Frame
+        frame_middle = self.create_middle_frame()
+        layout.addWidget(frame_middle)
+
+        # Bottom Frame
+        frame_down = self.create_bottom_frame()
+        layout.addWidget(frame_down)
+
+        # Set the main layout
+        self.setLayout(layout)
+        self.show()
+
+    def create_top_frame(self):
         frame_up = QFrame(self)
         frame_up.setStyleSheet(
             f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;"
         )
         frame_up.setFixedHeight(80)
-        layout.addWidget(frame_up)
 
-        # Add content to the top frame (frame_up)
         try:
             img_path = os.path.join(os.path.dirname(__file__), "log.png")
             if os.path.exists(img_path):
@@ -68,70 +84,90 @@ class MyApp(QWidget):
             frame_up_layout = QVBoxLayout(frame_up)
             frame_up_layout.addWidget(label_logo)
 
-        # Frame middle
+        return frame_up
+
+    def create_middle_frame(self):
         frame_middle = QFrame(self)
         frame_middle.setStyleSheet(
-            f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;"  
+            f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;"
         )
         frame_middle.setFixedHeight(300)
-        layout.addWidget(frame_middle)
-
-        # Create the main layout for frame_middle (HBoxLayout)
         frame_middle_layout = QHBoxLayout(frame_middle)
 
-        # Container for Progress Bar and Chart
-        progress_chart_container = QWidget(self)
-        progress_chart_container.setFixedWidth(200)
-        progress_chart_container.setStyleSheet("border: none;")
-        progress_chart_layout = QVBoxLayout(progress_chart_container)
+        # Progress Bar and Chart Container
+        progress_chart_container = self.create_progress_chart_container()
+        frame_middle_layout.addWidget(progress_chart_container)
 
-        top_left_layout = QVBoxLayout()
-        top_left_layout.setContentsMargins(10, 10, 10, 0)
-        top_left_layout.setSpacing(5)
+        # Totals Container
+        totals_container = self.create_totals_container()
+        frame_middle_layout.addWidget(totals_container)
 
+        # Circular Chart Container
+        circular_container = self.create_circular_container()
+        frame_middle_layout.addWidget(circular_container)
+
+        return frame_middle
+
+    def create_bottom_frame(self):
+        frame_down = QFrame(self)
+        frame_down.setStyleSheet(
+            f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;"
+        )
+        frame_down.setFixedHeight(300)
+        frame_down_layout = QHBoxLayout(frame_down)
+
+        # Tables Container
+        tables_container = self.create_tables_container()
+        frame_down_layout.addWidget(tables_container)
+
+        # CRUD Container
+        crud_container = self.create_crud_container("Enter new expenses:")
+        frame_down_layout.addWidget(crud_container)
+
+        # Configurations Container
+        configurations_container = self.create_crud_container("Enter new recipes:")
+        frame_down_layout.addWidget(configurations_container)
+
+        return frame_down
+
+    def create_progress_chart_container(self):
+        container = QWidget(self)
+        container.setFixedWidth(200)
+        container.setStyleSheet("border: none;")
+        layout = QVBoxLayout(container)
+
+        # Progress Bar Section
         label_percentage = QLabel("Percentage of income spent:", self)
         label_percentage.setStyleSheet(f"font: bold 10px Verdana; color: {c4}; border: none;")
-        top_left_layout.addWidget(label_percentage)
+        layout.addWidget(label_percentage)
 
-       # Progress Bar layout
         progress_layout = QHBoxLayout()
-        progress_layout.setSpacing(10)
-
-        bar = QProgressBar(frame_middle)
+        bar = QProgressBar(container)
         bar.setRange(0, 100)
         bar.setValue(50)
         bar.setTextVisible(False)
-
-        # Set a simpler style for the progress bar
         bar.setStyleSheet(
             f"""
             QProgressBar {{
-                background-color: {c9};  /* Background color */
-                border: 1px solid {c0};  /* Border color */
-                border-radius: 5px;      /* Rounded corners */
+                background-color: {c9};
+                border: 1px solid {c0};
+                border-radius: 5px;
             }}
             QProgressBar::chunk {{
-                background-color: {c7};  /* Progress color */
-                border-radius: 5px;      /* Rounded corners for progress */
+                background-color: {c7};
+                border-radius: 5px;
             }}
             """
         )
-
-        # Set the width and height of the progress bar
-        bar.setFixedWidth(120)  # Adjust as needed
-        bar.setFixedHeight(20)  # Adjust height to fit
-
-        # Add the progress bar and percentage label to the layout
-        percentage_label = QLabel("50%", frame_middle)
-        percentage_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0}; border: none;")
+        bar.setFixedSize(120, 20)
         progress_layout.addWidget(bar)
+
+        percentage_label = QLabel("50%", self)
+        percentage_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0}; border: none;")
         progress_layout.addWidget(percentage_label)
+        layout.addLayout(progress_layout)
 
-        # Add this layout to the parent container layout
-        top_left_layout.addLayout(progress_layout)
-        progress_chart_layout.addLayout(top_left_layout)
-
-        # Chart
+        # Chart Section
         list_categories = ["Income", "Expenses", "Balance"]
         list_values = [3000, 200, 6000]
         colors = [c2, c5, c6]
@@ -139,7 +175,6 @@ class MyApp(QWidget):
         figure = plt.Figure(figsize=(4, 4), dpi=60)
         ax = figure.add_subplot(111)
         ax.bar(list_categories, list_values, color=colors, width=0.9)
-
         for i, rect in enumerate(ax.patches):
             ax.text(
                 rect.get_x() + rect.get_width() / 2,
@@ -148,142 +183,96 @@ class MyApp(QWidget):
                 fontsize=10,
                 ha="center",
             )
-
-        ax.set_xticks(range(len(list_categories)))  # Define tick positions
-        ax.set_xticklabels(list_categories, fontsize=10)  # Apply labels            
-        ax.patch.set_facecolor(c1)
-        ax.spines["bottom"].set_color(c3)
-        ax.spines["bottom"].set_linewidth(1)
-        ax.spines["left"].set_color(c3)
-        ax.spines["left"].set_linewidth(1)
         ax.set_axisbelow(True)
         ax.yaxis.grid(color="#EEEEEE")
-        ax.xaxis.grid(False)
-
         canvas = FigureCanvas(figure)
+        layout.addWidget(canvas)
 
-        # Wrap the canvas in a QWidget to apply margins
-        canvas_container = QWidget(self)
-        canvas_container.setFixedWidth(200)
-        canvas_container.setStyleSheet("border: none;") 
-        canvas_layout = QVBoxLayout(canvas_container)
-        canvas_layout.addWidget(canvas)
+        return container
 
-        # Add the canvas container to the progress chart container
-        progress_chart_layout.addWidget(canvas_container)
+    def create_totals_container(self):
+        container = QWidget(self)
+        container.setFixedWidth(200)
+        container.setStyleSheet("border: none;")
+        layout = QVBoxLayout(container)
 
-        # Container for the Totals
-        totals_container = QWidget(self)
-        totals_container.setFixedWidth(200)
-        totals_container.setFixedHeight(180)
-        totals_container.setStyleSheet("border: none;") 
-        totals_layout = QVBoxLayout(totals_container)
+        # Total Income
+        self.add_total_item(layout, "Total Monthly Income", 500)
 
-        # Values to display
-        values = [500, 600, 420]
+        # Total Expenses
+        self.add_total_item(layout, "Total Monthly Expenses", 600)
 
-        # Total Monthly Income
-        income_label = QLabel(f"Total Monthly Income".upper(), self)
-        income_label.setStyleSheet(f"font: bold 12px Verdana; color: #83a9e6; background-color: {c1}; border: none")
-        income_value_label = QLabel(f"€ {values[0]:,.2f}".upper(), self)
-        income_value_label.setStyleSheet(f"font: bold 17px Arial; color: #545454; background-color: {c1}; border-top: 1px solid {c0};")
+        # Total Balance
+        self.add_total_item(layout, "Total Cash Balance", 420)
 
-        # Total Monthly Expenses
-        expenses_label = QLabel(f"Total Monthly Expenses".upper(), self)
-        expenses_label.setStyleSheet(f"font: bold 12px Verdana; color: #83a9e6; background-color: {c1}; border: none")
-        expenses_value_label = QLabel(f"€ {values[1]:,.2f}".upper(), self)
-        expenses_value_label.setStyleSheet(f"font: bold 17px Arial; color: #545454; background-color: {c1}; border-top: 1px solid {c0};")
+        return container
 
-        # Total Cash Balance
-        balance_label = QLabel(f"Total Cash Balance".upper(), self)
-        balance_label.setStyleSheet(f"font: bold 12px Verdana; color: #83a9e6; background-color: {c1}; border: none")
-        balance_value_label = QLabel(f"€ {values[2]:,.2f}".upper(), self)
-        balance_value_label.setStyleSheet(f"font: bold 17px Arial; color: #545454; background-color: {c1}; border-top: 1px solid {c0};")
+    def add_total_item(self, layout, title, value):
+        label_title = QLabel(title.upper(), self)
+        label_title.setStyleSheet(f"font: bold 12px Verdana; color: #83a9e6; border: none;")
+        layout.addWidget(label_title)
 
-        # Add the labels and rows to the totals layout
-        totals_layout.addWidget(income_label)
-        totals_layout.addWidget(income_value_label)
+        label_value = QLabel(f"€ {value:,.2f}".upper(), self)
+        label_value.setStyleSheet(
+            f"font: bold 17px Arial; color: #545454; border-top: 1px solid {c0};"
+        )
+        layout.addWidget(label_value)
 
-        totals_layout.addWidget(expenses_label)
-        totals_layout.addWidget(expenses_value_label)
+    def create_circular_container(self):
+        container = QWidget(self)
+        container.setFixedWidth(500)
+        container.setStyleSheet("border: none;")
+        layout = QVBoxLayout(container)
 
-        totals_layout.addWidget(balance_label)
-        totals_layout.addWidget(balance_value_label)
+        # Create Matplotlib figure
+        figure = plt.Figure(figsize=(4, 3), dpi=100)
+        ax = figure.add_subplot(111)
 
-        # Container for Donut Chart
-        circular_container = QWidget(self)
-        circular_container.setFixedWidth(500)
-        circular_container.setStyleSheet("border: none;") 
-        circular_layout = QVBoxLayout(circular_container)
-
-        # Donut Chart
-        chart_figure = plt.Figure(figsize=(3.5, 3), dpi=100)
-        chart_ax = chart_figure.add_subplot(111)
-
+        # Pie chart data
         values = [345, 225, 534]
         categories = ["Income", "Expenses", "Balance"]
         colors = ["#4fa882", "#038cfc", "#e06636"]
         explode = [0.05, 0.05, 0.05]
 
-        wedges, _, autotexts = chart_ax.pie(
+        # Plot pie chart
+        wedges, texts, autotexts = ax.pie(
             values,
             autopct="%1.1f%%",
             colors=colors,
             explode=explode,
             startangle=90,
-            wedgeprops={"width": 0.4, "edgecolor": "white"},
+            wedgeprops={"width": 0.4, "edgecolor": "white"}
         )
 
-        chart_ax.legend(
-            wedges, categories, title="Categories:", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1)
+        # Add legend to the side
+        ax.legend(
+            wedges,
+            categories,
+            title="Categories:",
+            loc="center left",
+            bbox_to_anchor=(1, 0, 0.5, 1),  # Positions legend to the right of the chart
+            fontsize=10
         )
 
-        chart_canvas = FigureCanvas(chart_figure)
-        circular_layout.addWidget(chart_canvas)
+        # Add Matplotlib figure to Qt widget
+        canvas = FigureCanvas(figure)
+        layout.addWidget(canvas)
 
-        # Add layouts to frame_middle
-        frame_middle_layout.addWidget(progress_chart_container)
-        frame_middle_layout.addWidget(totals_container)
-        frame_middle_layout.addWidget(circular_container)
+        return container
 
-        # Frame down
-        frame_down = QFrame(self)
-        frame_down.setStyleSheet(
-            f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;"
-        )
-        frame_down.setFixedHeight(300)
-        layout.addWidget(frame_down)
+    def create_tables_container(self):
+        container = QWidget(self)
+        container.setFixedWidth(210)
+        container.setStyleSheet("border: none;")
+        layout = QVBoxLayout(container)
 
-        frame_down_layout = QHBoxLayout(frame_down)
-        
-        # Container for the tables
-        tables_container = QWidget(self)
-        tables_container.setFixedWidth(250)
-        tables_container.setStyleSheet("border: none;")
-        tables_layout = QVBoxLayout(tables_container)
+        table_label = QLabel("Income and Expense table:", self)
+        table_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0};")
+        layout.addWidget(table_label)
 
-        # Add table label to the tables layout
-        table_label = QLabel(f"Income and Expense table:", self)
-        table_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0}; background-color: {c1}; border: none;")
-        tables_layout.addWidget(table_label)  # Add the label to the layout
-
-        # Create a QTableWidget for displaying the data
-        tabela_head = ['#Id', 'Categoria', 'Data', 'Quantia']
-        lista_itens = [[0, 2, 3, 4], [0, 2, 3, 4], [0, 2, 3, 4], [0, 2, 3, 4]]
-
-        table = QTableWidget(len(lista_itens), len(tabela_head), self)
-        table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        table.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-
-        # Set headers
-        table.setHorizontalHeaderLabels(tabela_head)
-
-        # Populate the table with data
-        for row_idx, row_data in enumerate(lista_itens):
-            for col_idx, col_data in enumerate(row_data):
-                item = QTableWidgetItem(str(col_data))
-                item.setTextAlignment(Qt.AlignCenter)  # Center-align text
-                table.setItem(row_idx, col_idx, item)
+        table = QTableWidget(10, 4, self)
+        table.setHorizontalHeaderLabels(['ID', 'Item', 'Date', 'Amount'])
+        layout.addWidget(table)
 
         # Adjust column widths to fit the content
         table.resizeColumnsToContents()
@@ -300,6 +289,7 @@ class MyApp(QWidget):
             }}
             QTableWidget::item {{
                 border: 1px solid {c3};  /* Item border */
+                
                 padding: 5px;  /* Cell padding */
             }}
             QHeaderView::section {{
@@ -312,47 +302,38 @@ class MyApp(QWidget):
             """
         )
 
-        # Add table to the layout
-        tables_layout.addWidget(table)
+        return container
 
-        # Set the layout for the container
-        self.setLayout(tables_layout)
+    def create_crud_container(self, label_text):
+        container = QWidget(self)
+        container.setFixedWidth(240)
+        container.setStyleSheet("border: none;")
+        layout = QVBoxLayout(container)
 
-        # Container for the CRUD
-        crud_container = QWidget(self)
-        crud_container.setFixedWidth(100)
-        crud_container.setStyleSheet("border: none;") 
-        crud_layout = QVBoxLayout(crud_container)
+        crud_label = QLabel("Enter new Expenses:", self)
+        crud_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0};")
+        layout.addWidget(crud_label)
 
-        # Add crud label to the cruds layout
-        crud_label = QLabel(f"Enter new expenses:", self)
-        crud_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0} background-color: {c1}; border: none")
-        crud_layout.addWidget(crud_label)  # Add the label to the layout
-        
-        # Set the layout for crud_container
-        crud_container.setLayout(crud_layout)
+        # Add additional components for CRUD functionality here
+        # For example, text input fields, buttons, etc.
+        return container
 
-        # Container for the configurations
-        configurations_container = QWidget(self)
-        configurations_container.setFixedWidth(100)
-        configurations_container.setStyleSheet("border: none;") 
-        configurations_layout = QVBoxLayout(configurations_container)
+    def create_configurations_container(self, label_text):
+        container = QWidget(self)
+        container.setFixedWidth(240)
+        container.setStyleSheet("border: none;")
+        layout = QVBoxLayout(container)
 
-         # Add configurations label to the configurations layout
-        configurations_label = QLabel(f"Enter new recipes:", self)
-        configurations_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0} background-color: {c1}; border: none")
-        configurations_layout.addWidget(configurations_label)  # Add the label to the layout
+        configurations_label = QLabel("Enter new Eecipes:", self)
+        configurations_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0};")
+        layout.addWidget(configurations_label)
 
-        # Set the layout for configurations_container
-        configurations_container.setLayout(configurations_layout)
+        # Add additional components for CRUD functionality here
+        # For example, text input fields, buttons, etc.
+        return container
 
-        # Add layouts to frame_down
-        frame_down_layout.addWidget(tables_container)
-        frame_down_layout.addWidget(crud_container)
-        frame_down_layout.addWidget(configurations_container)
 
-        self.show()
-
+# Main execution
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MyApp()
