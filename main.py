@@ -362,8 +362,46 @@ class MyApp(QWidget):
                 padding: 5px;
                 color: black;
             }
-            """
-        )
+            QCalendarWidget {
+                background-color: #f0f0f0;
+                border: 1px solid #aaa;
+                font-size: 12px;
+                color: #333;
+            }
+            QCalendarWidget QAbstractItemView {
+                background-color: #f0f0f0;
+                selection-background-color: #4CAF50;
+                selection-color: white;
+                color: #333;
+            }
+            QCalendarWidget QTableView {
+                background-color: #f0f0f0;
+                selection-background-color: #4CAF50;
+                selection-color: white;
+                color: #333;
+                border: none;
+            }
+            QCalendarWidget QTableView::item {
+                border: 1px solid #ddd;
+                padding: 5px;
+                font-size: 12px;
+            }
+            QCalendarWidget QTableView::item:selected {
+                background-color: #4CAF50;
+                color: white;
+            }
+            QCalendarWidget QToolButton {
+                background-color: #4CAF50;
+                color: white;
+                border-radius: 5px;
+            }
+            QCalendarWidget QToolButton:hover {
+                background-color: #45a049;
+            }
+            QCalendarWidget QToolButton:pressed {
+                background-color: #388e3c;
+            }
+        """)
 
         # Set the current date as default
         current_date = date.today()
