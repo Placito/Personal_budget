@@ -3,9 +3,10 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame,
-    QProgressBar, QTableWidget, QTableWidgetItem, QPushButton, QComboBox, QCalendarWidget
+    QProgressBar, QTableWidget, QTableWidgetItem, QLineEdit, QDateEdit, QComboBox, QListWidget
 )
 from PyQt5.QtGui import QPixmap
+from datetime import date 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 
@@ -25,6 +26,10 @@ c9 = "#e9edf5"  # another green
 class MyApp(QWidget):
     def __init__(self):
         super().__init__()
+
+        # Define categories and selected_categories
+        self.categories = ['Travel', 'Food', 'Entertainment', 'Shopping']
+        self.selected_categories = []
 
         # Set up window
         self.setWindowTitle("PyQt Example")
@@ -294,6 +299,7 @@ class MyApp(QWidget):
         )
         return container
 
+    
     def create_crud_container(self, widget_title):
         container = QWidget(self)
         container.setStyleSheet("border: none;")
@@ -304,19 +310,108 @@ class MyApp(QWidget):
         label_crud.setStyleSheet("font: bold 10px Verdana; color: black;")
         layout.addWidget(label_crud)
 
-        # ComboBox for selecting categories
-        self.combo_category = QComboBox(self)
-        self.combo_category.addItems(self.categories)
-        layout.addWidget(self.combo_category)
+        # Horizontal layout for category label and input
+        category_layout = QHBoxLayout()
 
-        # Add Button
-        self.add_button = QPushButton("Add Category", self)
-        self.add_button.clicked.connect(self.add_category)  # Connect button click to add_category method
-        layout.addWidget(self.add_button)
+        # Label for category input
+        label_category = QLabel("Category:", self)
+        label_category.setStyleSheet("font: 10px Verdana; color: black;")
+        category_layout.addWidget(label_category)
+
+        # Input field for category with placeholder
+        self.input_category = QLineEdit(self)
+        self.input_category.setPlaceholderText("Enter category here...")  # Placeholder text
+        self.input_category.setStyleSheet(
+            """
+            QLineEdit {
+                font: 10px Verdana;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 5px;
+                color: black;
+            }
+            """
+        )
+        category_layout.addWidget(self.input_category)
+
+        # Add the horizontal layout to the main container layout
+        layout.addLayout(category_layout)
+
+        # Horizontal layout for date input
+        date_layout = QHBoxLayout()
+
+        # Label for date input
+        label_date = QLabel("Date:", self)
+        label_date.setStyleSheet("font: 10px Verdana; color: black;")
+        date_layout.addWidget(label_date)
+
+        # Date input field with default current date
+        self.date_input = QDateEdit(self)
+        self.date_input.setCalendarPopup(True)  # Enable calendar dropdown
+        self.date_input.setDisplayFormat("yyyy-MM-dd")  # Format the date
+        self.date_input.setStyleSheet(
+            """
+            QDateEdit {
+                font: 10px Verdana;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 5px;
+                color: black;
+            }
+            QCalendarWidget {
+                background-color: #f0f0f0;
+                border: 1px solid #aaa;
+                font-size: 12px;
+                color: #333;
+            }
+            QCalendarWidget QAbstractItemView {
+                background-color: #f0f0f0;
+                selection-background-color: #4CAF50;
+                selection-color: white;
+                color: #333;
+            }
+            QCalendarWidget QTableView {
+                background-color: #f0f0f0;
+                selection-background-color: #4CAF50;
+                selection-color: white;
+                color: #333;
+                border: none;
+            }
+            QCalendarWidget QTableView::item {
+                border: 1px solid #ddd;
+                padding: 5px;
+                font-size: 12px;
+            }
+            QCalendarWidget QTableView::item:selected {
+                background-color: #4CAF50;
+                color: white;
+            }
+            QCalendarWidget QToolButton {
+                background-color: #4CAF50;
+                color: white;
+                border-radius: 5px;
+            }
+            QCalendarWidget QToolButton:hover {
+                background-color: #45a049;
+            }
+            QCalendarWidget QToolButton:pressed {
+                background-color: #388e3c;
+            }
+        """)
+
+        # Set the current date as default
+        current_date = date.today()
+        self.date_input.setDate(current_date)  # Set current date
+        date_layout.addWidget(self.date_input)
+
+        # Add the date layout to the main container layout
+        layout.addLayout(date_layout)
 
         # List Widget to display added categories
         self.list_widget = QListWidget(self)
         layout.addWidget(self.list_widget)
+
+        return container
 
     def add_category(self):
         # Get the selected category
@@ -325,35 +420,6 @@ class MyApp(QWidget):
             # Add it to the list and the QListWidget
             self.selected_categories.append(selected_category)
             self.list_widget.addItem(selected_category)
-            
-         # Grabbing categories
-        categories = ['Travel', 'Food', 'Entertainment', 'Shopping']
-        # Create and show the widget
-        widget = CategoryInput("Choose and Add Category", categories)
-        widget.resize(300, 200)
-        widget.show()
-
-        # PyQt QComboBox
-        combo_category_expense = QComboBox(container)
-        combo_category_expense.addItems(categories)  # Add categories to the combo box
-        layout.addWidget(combo_category_expense)  # Add the combo box to the layout
-
-
-        return container
-
-
-    def create_configurations_container(self, widget_title):
-        container = QWidget(self)
-        container.setFixedWidth(240)
-        container.setStyleSheet("border: none;")
-        layout = QVBoxLayout(container)
-
-        configurations_label = QLabel(widget_title.upper(), self)
-        configurations_label.setStyleSheet(f"font: bold 8px Verdana; color: {c0};")
-        layout.addWidget(configurations_label)
-
-        return container
-
 
 # Main execution
 if __name__ == "__main__":
