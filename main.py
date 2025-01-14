@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame,
-    QProgressBar, QTableWidget, QTableWidgetItem, QLineEdit, QDateEdit, QComboBox, QListWidget
+    QProgressBar, QTableWidget, QTableWidgetItem, QLineEdit, QDateEdit, QComboBox, QListWidget, QMessageBox, QPushButton
 )
 from PyQt5.QtGui import QPixmap
 from datetime import date 
@@ -258,25 +258,27 @@ class MyApp(QWidget):
         table_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0};")
         layout.addWidget(table_label)
 
-        table = QTableWidget(10, 4, self)
-        table.setHorizontalHeaderLabels(['ID', 'Item', 'Date', 'Amount'])
-        layout.addWidget(table)
+        self.table = QTableWidget(10, 4, self)  # Set self.table here
+        self.table.setHorizontalHeaderLabels(['ID', 'Item', 'Date', 'Amount'])
+        self.table.setSelectionBehavior(QTableWidget.SelectRows)  # Allow row selection
+
+        layout.addWidget(self.table)
 
         list_Items = [[1, "Salary", "2025-01-01", 3000],
-              [2, "Rent", "2025-01-05", -1200],
-              [3, "Groceries", "2025-01-10", -300],
-              [4, "Freelance Work", "2025-01-15", 800]]
+                    [2, "Rent", "2025-01-05", -1200],
+                    [3, "Groceries", "2025-01-10", -300],
+                    [4, "Freelance Work", "2025-01-15", 800]]
 
         # Populate the QTableWidget
         for row_idx, row_data in enumerate(list_Items):
             for col_idx, col_data in enumerate(row_data):
-                table.setItem(row_idx, col_idx, QTableWidgetItem(str(col_data)))
+                self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(col_data)))
 
         # Adjust column widths to fit the content
-        table.resizeColumnsToContents()
+        self.table.resizeColumnsToContents()
 
         # Apply style to the table
-        table.setStyleSheet(
+        self.table.setStyleSheet(
             f"""
             QTableWidget {{
                 background-color: {c9};  /* Background color */
@@ -297,8 +299,8 @@ class MyApp(QWidget):
             }}
             """
         )
+        # Return the container
         return container
-
     
     def create_crud_container(self, widget_title):
         container = QWidget(self)
@@ -312,6 +314,7 @@ class MyApp(QWidget):
 
         # Horizontal layout for category label and input
         category_layout = QHBoxLayout()
+        category_layout.setSpacing(10)  # Set 10px spacing between widgets
 
         # Label for category input
         label_category = QLabel("Category:", self)
@@ -337,8 +340,9 @@ class MyApp(QWidget):
         # Add the horizontal layout to the main container layout
         layout.addLayout(category_layout)
 
-        # Horizontal layout for date input
+        # Horizontal layout for date input with 10px spacing
         date_layout = QHBoxLayout()
+        date_layout.setSpacing(10)  # Set 10px spacing between widgets
 
         # Label for date input
         label_date = QLabel("Date:", self)
@@ -358,50 +362,12 @@ class MyApp(QWidget):
                 padding: 5px;
                 color: black;
             }
-            QCalendarWidget {
-                background-color: #f0f0f0;
-                border: 1px solid #aaa;
-                font-size: 12px;
-                color: #333;
-            }
-            QCalendarWidget QAbstractItemView {
-                background-color: #f0f0f0;
-                selection-background-color: #4CAF50;
-                selection-color: white;
-                color: #333;
-            }
-            QCalendarWidget QTableView {
-                background-color: #f0f0f0;
-                selection-background-color: #4CAF50;
-                selection-color: white;
-                color: #333;
-                border: none;
-            }
-            QCalendarWidget QTableView::item {
-                border: 1px solid #ddd;
-                padding: 5px;
-                font-size: 12px;
-            }
-            QCalendarWidget QTableView::item:selected {
-                background-color: #4CAF50;
-                color: white;
-            }
-            QCalendarWidget QToolButton {
-                background-color: #4CAF50;
-                color: white;
-                border-radius: 5px;
-            }
-            QCalendarWidget QToolButton:hover {
-                background-color: #45a049;
-            }
-            QCalendarWidget QToolButton:pressed {
-                background-color: #388e3c;
-            }
-        """)
+            """
+        )
 
         # Set the current date as default
         current_date = date.today()
-        self.date_input.setDate(current_date)  # Set current date
+        self.date_input.setDate(date.today()) # Set current date
         date_layout.addWidget(self.date_input)
 
         # Add the date layout to the main container layout
@@ -411,7 +377,126 @@ class MyApp(QWidget):
         self.list_widget = QListWidget(self)
         layout.addWidget(self.list_widget)
 
+        # Horizontal layout for amount label and input with 10px spacing
+        amount_layout = QHBoxLayout()
+        amount_layout.setSpacing(10)  # Set 10px spacing between widgets
+
+        # Label for amount input
+        label_amount = QLabel("Total:", self)
+        label_amount.setStyleSheet("font: 10px Verdana; color: black;")
+        amount_layout.addWidget(label_amount)
+
+        # Input field for amount with placeholder
+        self.input_amount = QLineEdit(self)
+        self.input_amount.setPlaceholderText("Enter amount here...")  # Placeholder text
+        self.input_amount.setStyleSheet(
+            """
+            QLineEdit {
+                font: 10px Verdana;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 5px;
+                color: black;
+            }
+            """
+        )
+        amount_layout.addWidget(self.input_amount)
+
+        # Add the horizontal layout to the main container layout
+        layout.addLayout(amount_layout)
+
+        # Add Button to add the data to the table
+        self.add_button = QPushButton("Add Entry", self)
+        self.add_button.setStyleSheet(
+            """
+            QPushButton {
+                font: 10px Verdana;
+                background-color: #4CAF50;
+                color: white;
+                border-radius: 5px;
+                padding: 10px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+            QPushButton:pressed {
+                background-color: #388e3c;
+            }
+            """
+        )
+        layout.addWidget(self.add_button)
+
+        # Add Button to remove selected entry
+        self.remove_button = QPushButton("Remove Entry", self)
+        self.remove_button.setStyleSheet(
+            """
+            QPushButton {
+                font: 10px Verdana;
+                background-color: #F44336;
+                color: white;
+                border-radius: 5px;
+                padding: 10px;
+            }
+            QPushButton:hover {
+                background-color: #e53935;
+            }
+            QPushButton:pressed {
+                background-color: #d32f2f;
+            }
+            """
+        )
+        layout.addWidget(self.remove_button)
+
+        # Connect the add and remove buttons to their respective functions
+        self.add_button.clicked.connect(self.add_data_to_table)
+        self.remove_button.clicked.connect(self.remove_data_from_table)
+
         return container
+
+    def add_data_to_table(self):
+        # Get the category, date, and amount
+        category = self.input_category.text().strip()
+        date = self.date_input.date().toString("yyyy-MM-dd")
+        amount = self.input_amount.text().strip()
+
+        # Make sure we have valid inputs
+        if category and date and amount:
+            try:
+                amount = float(amount)  # Convert amount to a number
+            except ValueError:
+                # If amount is not a valid number, show an error message
+                return
+
+            # Find the next available ID (auto-increment)
+            row_count = self.table.rowCount()
+            new_id = row_count + 1
+
+            # Add the data to the table
+            self.table.insertRow(row_count)
+            self.table.setItem(row_count, 0, QTableWidgetItem(str(new_id)))
+            self.table.setItem(row_count, 1, QTableWidgetItem(category))
+            self.table.setItem(row_count, 2, QTableWidgetItem(date))
+            self.table.setItem(row_count, 3, QTableWidgetItem(f"€ {amount:,.2f}"))
+
+        # Clear input fields
+        self.input_category.clear()
+        self.input_amount.clear()
+        self.date_input.setDate(date.today())
+
+    def remove_data_from_table(self):
+        # Get the selected row
+        selected_row = self.table.currentRow()
+
+        if selected_row >= 0:  # Check if a row is selected
+            # Remove the selected row from the table
+            self.table.removeRow(selected_row)
+
+            # Adjust IDs for remaining rows (optional)
+            for row in range(self.table.rowCount()):
+                self.table.item(row, 0).setText(str(row + 1))  # Update ID column
+        else:
+            # If no row is selected, show an error message
+            QMessageBox.warning(self, "No selection", "Please select an entry to remove.")
 
     def add_category(self):
         # Get the selected category
