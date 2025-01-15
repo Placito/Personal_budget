@@ -132,7 +132,7 @@ class MyApp(QWidget):
         frame_down_layout.addWidget(crud_container)
 
         # Configurations Container
-        configurations_container = self.create_crud_container("Enter new recipes:")
+        configurations_container = self.create_configurations_container("Enter new recipes:")
         frame_down_layout.addWidget(configurations_container)
 
         return frame_down
@@ -305,6 +305,7 @@ class MyApp(QWidget):
     def create_crud_container(self, widget_title):
         container = QWidget(self)
         container.setStyleSheet("border: none;")
+        container.setFixedWidth(250)
         layout = QVBoxLayout(container)
 
         # Title Label
@@ -488,6 +489,33 @@ class MyApp(QWidget):
         # Connect the add and remove buttons to their respective functions
         self.add_button.clicked.connect(self.add_data_to_table)
         self.remove_button.clicked.connect(self.remove_data_from_table)
+
+        return container
+
+    def create_configurations_container(self, widget_title):
+        container = QWidget(self)
+        container.setStyleSheet("border: none;")
+        container.setFixedWidth(250)
+        layout = QVBoxLayout(container)
+
+        # Title Label
+        label_crud = QLabel(widget_title.upper(), self)
+        label_crud.setStyleSheet("font: bold 10px Verdana; color: black;")
+        layout.addWidget(label_crud)
+
+        # Horizontal layout for category label and input
+        category_layout = QHBoxLayout()
+        category_layout.setSpacing(10)  # Set 10px spacing between widgets
+
+        # Label for category input
+        label_category = QLabel("Category:", self)
+        label_category.setStyleSheet("font: 10px Verdana; color: black;")
+        category_layout.addWidget(label_category)
+
+    
+
+        # Add the horizontal layout to the main container layout
+        layout.addLayout(category_layout)
 
         return container
 
