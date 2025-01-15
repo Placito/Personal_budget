@@ -28,7 +28,7 @@ class MyApp(QWidget):
         super().__init__()
 
         # Define categories and selected_categories
-        self.categories = ['Travel', 'Food', 'Entertainment', 'Shopping']
+        self.categories = ['Choose a category', 'Travel', 'Food', 'Entertainment', 'Shopping']
         self.selected_categories = []
 
         # Set up window
@@ -322,20 +322,30 @@ class MyApp(QWidget):
         label_category.setStyleSheet("font: 10px Verdana; color: black;")
         category_layout.addWidget(label_category)
 
-        # Input field for category with placeholder
-        self.input_category = QLineEdit(self)
-        self.input_category.setPlaceholderText("Enter category here...")  # Placeholder text
+        # Dropdown (ComboBox) for selecting a category
+        self.input_category = QComboBox(self)
+        self.input_category.addItems(self.categories)  # Add categories to the dropdown
+
+        # Set default value (e.g., first category)
+        default_index = 0  # Change this to the desired index of the default value"
+        self.input_category.setCurrentIndex(default_index)
+
         self.input_category.setStyleSheet(
             """
-            QLineEdit {
+            QComboBox {
                 font: 10px Verdana;
                 border: 1px solid #ccc;
                 border-radius: 5px;
                 padding: 5px;
                 color: black;
+                width: 180px;
+            }
+            QComboBox::drop-down {
+                border: 0px;
             }
             """
         )
+
         category_layout.addWidget(self.input_category)
 
         # Add the horizontal layout to the main container layout
@@ -343,11 +353,10 @@ class MyApp(QWidget):
 
         # Horizontal layout for date input with 10px spacing
         date_layout = QHBoxLayout()
-        date_layout.setSpacing(10)  # Set 10px spacing between widgets
 
         # Label for date input
         label_date = QLabel("Date:", self)
-        label_date.setStyleSheet("font: 10px Verdana; color: black;")
+        label_date.setStyleSheet("font: 10px Verdana; color: black; padding: 0px; margin: 0")
         date_layout.addWidget(label_date)
 
         # Date input field with default current date
@@ -368,6 +377,7 @@ class MyApp(QWidget):
                 border: 1px solid #aaa;
                 font-size: 12px;
                 color: #333;
+                width: 180px;
             }
             QCalendarWidget QAbstractItemView {
                 background-color: #f0f0f0;
@@ -405,7 +415,6 @@ class MyApp(QWidget):
         """)
 
         # Set the current date as default
-        current_date = date.today()
         self.date_input.setDate(date.today()) # Set current date
         date_layout.addWidget(self.date_input)
 
@@ -445,7 +454,7 @@ class MyApp(QWidget):
         layout.addLayout(amount_layout)
 
         # Add Button to add the data to the table
-        self.add_button = QPushButton("Add Entry", self)
+        self.add_button = QPushButton("Add", self)
         self.add_button.setStyleSheet(
             """
             QPushButton {
@@ -465,8 +474,8 @@ class MyApp(QWidget):
         )
         layout.addWidget(self.add_button)
 
-        # Add Button to remove selected entry
-        self.remove_button = QPushButton("Remove Entry", self)
+        # Add Button to remove selected
+        self.remove_button = QPushButton("Remove", self)
         self.remove_button.setStyleSheet(
             """
             QPushButton {
@@ -503,7 +512,127 @@ class MyApp(QWidget):
         label_crud.setStyleSheet("font: bold 10px Verdana; color: black;")
         layout.addWidget(label_crud)
 
-        # Horizontal layout for category label and input
+        # Horizontal layout for date input with 10px spacing
+        date_layout = QHBoxLayout()
+        date_layout.setSpacing(0)  # Set 10px spacing between widgets
+
+        # Label for date input
+        label_date = QLabel("Date:", self)
+        label_date.setStyleSheet("font: 10px Verdana; color: black;")
+        date_layout.addWidget(label_date)
+
+        # Date input field with default current date
+        self.date_input = QDateEdit(self)
+        self.date_input.setCalendarPopup(True)  # Enable calendar dropdown
+        self.date_input.setDisplayFormat("yyyy-MM-dd")  # Format the date
+        self.date_input.setStyleSheet(
+            """
+            QDateEdit {
+                font: 10px Verdana;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 5px;
+                color: black;
+            }
+            QCalendarWidget {
+                background-color: #f0f0f0;
+                border: 1px solid #aaa;
+                font-size: 12px;
+                color: #333;
+                width: 180px;
+            }
+            QCalendarWidget QAbstractItemView {
+                background-color: #f0f0f0;
+                selection-background-color: #4CAF50;
+                selection-color: white;
+                color: #333;
+            }
+            QCalendarWidget QTableView {
+                background-color: #f0f0f0;
+                selection-background-color: #4CAF50;
+                selection-color: white;
+                color: #333;
+                border: none;
+            }
+            QCalendarWidget QTableView::item {
+                border: 1px solid #ddd;
+                padding: 5px;
+                font-size: 12px;
+            }
+            QCalendarWidget QTableView::item:selected {
+                background-color: #4CAF50;
+                color: white;
+            }
+            QCalendarWidget QToolButton {
+                background-color: #4CAF50;
+                color: white;
+                border-radius: 5px;
+            }
+            QCalendarWidget QToolButton:hover {
+                background-color: #45a049;
+            }
+            QCalendarWidget QToolButton:pressed {
+                background-color: #388e3c;
+            }
+        """)
+
+        # Set the current date as default
+        self.date_input.setDate(date.today()) # Set current date
+        date_layout.addWidget(self.date_input)
+
+        # Add the date layout to the main container layout
+        layout.addLayout(date_layout)
+
+        # Horizontal layout for Total Amount label and input
+        total_amount_layout = QHBoxLayout()
+        total_amount_layout.setSpacing(10)  # Set 10px spacing between widgets
+
+        # Label for Total Amountt input
+        label_total_amount = QLabel("Total Amount:", self)
+        label_total_amount.setStyleSheet("font: 10px Verdana; color: black;")
+        total_amount_layout.addWidget(label_total_amount)
+
+        # Input field for Total Amount with placeholder
+        self.input_total_amount = QLineEdit(self)
+        self.input_total_amount.setPlaceholderText("Enter here...")  # Placeholder text
+        self.input_total_amount.setStyleSheet(
+            """
+            QLineEdit {
+                font: 10px Verdana;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 5px;
+                color: black;
+            }
+            """
+        )
+        total_amount_layout.addWidget(self.input_total_amount)
+
+        # Add the horizontal layout to the main container layout
+        layout.addLayout(total_amount_layout)
+
+        # Add Button to add the data to the table
+        self.add_button = QPushButton("Add", self)
+        self.add_button.setStyleSheet(
+            """
+            QPushButton {
+                font: 10px Verdana;
+                background-color: #4CAF50;
+                color: white;
+                border-radius: 5px;
+                padding: 10px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+            QPushButton:pressed {
+                background-color: #388e3c;
+            }
+            """
+        )
+        layout.addWidget(self.add_button)
+
+         # Horizontal layout for category label and input
         category_layout = QHBoxLayout()
         category_layout.setSpacing(10)  # Set 10px spacing between widgets
 
@@ -512,10 +641,47 @@ class MyApp(QWidget):
         label_category.setStyleSheet("font: 10px Verdana; color: black;")
         category_layout.addWidget(label_category)
 
-    
+        # Input field for category with placeholder
+        self.input_category = QLineEdit(self)
+        self.input_category.setPlaceholderText("Enter category here...")  # Placeholder text
+        self.input_category.setStyleSheet(
+            """
+            QLineEdit {
+                font: 10px Verdana;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 5px;
+                color: black;
+            }
+            """
+        )
+        category_layout.addWidget(self.input_category)
 
         # Add the horizontal layout to the main container layout
         layout.addLayout(category_layout)
+
+
+        # Add Button to add the data to the table
+        self.add_button = QPushButton("Add", self)
+        self.add_button.setStyleSheet(
+            """
+            QPushButton {
+                font: 10px Verdana;
+                background-color: #4CAF50;
+                color: white;
+                border-radius: 5px;
+                padding: 10px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+            QPushButton:pressed {
+                background-color: #388e3c;
+            }
+            """
+        )
+        layout.addWidget(self.add_button)
+
 
         return container
 
@@ -562,7 +728,7 @@ class MyApp(QWidget):
                 self.table.item(row, 0).setText(str(row + 1))  # Update ID column
         else:
             # If no row is selected, show an error message
-            QMessageBox.warning(self, "No selection", "Please select an entry to remove.")
+            QMessageBox.warning(self, "No selection", "Please select an to remove.")
 
     def add_category(self):
         # Get the selected category
