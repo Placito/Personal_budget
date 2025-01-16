@@ -10,6 +10,8 @@ from datetime import date
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 
+from view import delete_expense, delete_recipe, insert_expense, insert_recipe, see_expenses, see_recipes
+
 
 # Colors
 c0 = "#2e2d2b"  # black
@@ -703,53 +705,58 @@ class MyApp(QWidget):
         self.is_expense = True  # Set to expense mode (negative amount)
 
     def add_data_to_table(self):
-        # Get the category, date, and amount
         category = self.input_category.text().strip()
-        date = self.date_input.date()  # This is already a QDate object, no need to convert it
+        date = self.date_input.date().toString("yyyy-MM-dd")  # Get date as string
         amount = self.input_amount.text().strip()
 
-        # Make sure we have valid inputs
         if category and date and amount:
             try:
                 amount = float(amount)  # Convert amount to a number
             except ValueError:
-                # If amount is not a valid number, show an error message
-                return
+                return  # Handle the error appropriately here
 
-            # Adjust amount based on whether it's an expense or receipt
-            if self.is_expense:
-                amount = -abs(amount)  # Make the amount negative if it's an expense
+            # Insert data into the Recipes or Expenses table (depending on your use case)
+            if self.is_expense:  # Assuming you have a flag to check whether it's expense or recipe
+                insert_expense(category, date, amount)
+            else:
+                insert_recipe(category, date, amount)
 
-            # Find the next available ID (auto-increment)
-            row_count = self.table.rowCount()
-            new_id = row_count + 1
-
-            # Add the data to the table
-            self.table.insertRow(row_count)
-            self.table.setItem(row_count, 0, QTableWidgetItem(str(new_id)))
-            self.table.setItem(row_count, 1, QTableWidgetItem(category))
-            self.table.setItem(row_count, 2, QTableWidgetItem(date.toString("yyyy-MM-dd")))
-            self.table.setItem(row_count, 3, QTableWidgetItem(f"€ {amount:,.2f}"))
-
-        # Clear input fields
-        self.input_category.clear()
-        self.input_amount.clear()
-        self.date_input.setDate(QDate.currentDate())
+            # Reload the table or UI after adding data
+            self.update_table()
+            self.clear_inputs()
 
     def remove_data_from_table(self):
-        # Get the selected row
         selected_row = self.table.currentRow()
+        if selected_row >= 0:
+            item_id = self.table.item(selected_row, 0).text()  # Assuming the ID is in the first column
+            item_id = int(item_id)
 
-        if selected_row >= 0:  # Check if a row is selected
-            # Remove the selected row from the table
-            self.table.removeRow(selected_row)
+            # Check if it's a recipe or expense
+            if self.is_expense:
+                delete_expense(item_id)
+            else:
+                delete_recipe(item_id)
 
-            # Adjust IDs for remaining rows (optional)
-            for row in range(self.table.rowCount()):
-                self.table.item(row, 0).setText(str(row + 1))  # Update ID column
+            # Reload the table or UI after removing data
+            self.update_table()
+
+    def update_table(self):
+        """ Refresh the data shown in the table. """
+        # Clear existing table rows
+        self.table.setRowCount(0)
+        # Fetch updated data from the database
+        if self.is_expense:
+            data = see_expenses()
         else:
-            # If no row is selected, show an error message
-            QMessageBox.warning(self, "No selection", "Please select an to remove.")
+            data = see_recipes()
+        
+        # Populate the table with the updated data
+        for row_data in data:
+            row_position = self.table.rowCount()
+            self.table.insertRow(row_position)
+            for col_idx, col_data in enumerate(row_data):
+                self.table.setItem(row_position, col_idx, QTableWidgetItem(str(col_data)))
+
 
     def add_category(self):
         # Get the selected category
