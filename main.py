@@ -1,6 +1,6 @@
 import os
 import sys
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame,
     QProgressBar, QTableWidget, QTableWidgetItem, QLineEdit, QDateEdit, QComboBox, QListWidget, QMessageBox, QPushButton
@@ -109,7 +109,6 @@ class MyApp(QWidget):
         totals_container = self.create_totals_container()
         frame_middle_layout.addWidget(totals_container)
 
-
         # Circular Chart Container
         circular_container = self.create_circular_container()
         frame_middle_layout.addWidget(circular_container)
@@ -195,17 +194,6 @@ class MyApp(QWidget):
 
         return container
 
-    def add_total_item(self, layout, title, value):
-        label_title = QLabel(title.upper(), self)
-        label_title.setStyleSheet(f"font: bold 12px Verdana; color: #83a9e6; border: none;")
-        layout.addWidget(label_title)
-
-        label_value = QLabel(f"€ {value:,.2f}".upper(), self)
-        label_value.setStyleSheet(
-            f"font: bold 17px Arial; color: #545454; border-top: 1px solid {c0};"
-        )
-        layout.addWidget(label_value)
-
     def create_circular_container(self):
         container = QWidget(self)
         container.setFixedWidth(500)
@@ -247,6 +235,17 @@ class MyApp(QWidget):
         layout.addWidget(canvas)
 
         return container
+
+    def add_total_item(self, layout, title, value):
+            label_title = QLabel(title.upper(), self)
+            label_title.setStyleSheet(f"font: bold 12px Verdana; color: #83a9e6; border: none;")
+            layout.addWidget(label_title)
+
+            label_value = QLabel(f"€ {value:,.2f}".upper(), self)
+            label_value.setStyleSheet(
+                f"font: bold 17px Arial; color: #545454; border-top: 1px solid {c0};"
+            )
+            layout.addWidget(label_value)
 
     def create_tables_container(self):
         container = QWidget(self)
@@ -353,6 +352,7 @@ class MyApp(QWidget):
 
         # Horizontal layout for date input with 10px spacing
         date_layout = QHBoxLayout()
+        date_layout.setSpacing(10)
 
         # Label for date input
         label_date = QLabel("Date:", self)
@@ -371,13 +371,13 @@ class MyApp(QWidget):
                 border-radius: 5px;
                 padding: 5px;
                 color: black;
+                width: 180px;
             }
             QCalendarWidget {
                 background-color: #f0f0f0;
                 border: 1px solid #aaa;
                 font-size: 12px;
                 color: #333;
-                width: 180px;
             }
             QCalendarWidget QAbstractItemView {
                 background-color: #f0f0f0;
@@ -415,15 +415,15 @@ class MyApp(QWidget):
         """)
 
         # Set the current date as default
-        self.date_input.setDate(date.today()) # Set current date
+        self.date_input.setDate(QDate.currentDate()) # Set current date
         date_layout.addWidget(self.date_input)
 
         # Add the date layout to the main container layout
         layout.addLayout(date_layout)
 
         # List Widget to display added categories
-        self.list_widget = QListWidget(self)
-        layout.addWidget(self.list_widget)
+        # self.list_widget = QListWidget(self)
+        # layout.addWidget(self.list_widget)
 
         # Horizontal layout for amount label and input with 10px spacing
         amount_layout = QHBoxLayout()
@@ -514,7 +514,7 @@ class MyApp(QWidget):
 
         # Horizontal layout for date input with 10px spacing
         date_layout = QHBoxLayout()
-        date_layout.setSpacing(0)  # Set 10px spacing between widgets
+        date_layout.setSpacing(10)  # Set 10px spacing between widgets
 
         # Label for date input
         label_date = QLabel("Date:", self)
@@ -533,13 +533,13 @@ class MyApp(QWidget):
                 border-radius: 5px;
                 padding: 5px;
                 color: black;
+                width: 180px;
             }
             QCalendarWidget {
                 background-color: #f0f0f0;
                 border: 1px solid #aaa;
                 font-size: 12px;
                 color: #333;
-                width: 180px;
             }
             QCalendarWidget QAbstractItemView {
                 background-color: #f0f0f0;
@@ -577,7 +577,7 @@ class MyApp(QWidget):
         """)
 
         # Set the current date as default
-        self.date_input.setDate(date.today()) # Set current date
+        self.date_input.setDate(QDate.currentDate()) # Set current date
         date_layout.addWidget(self.date_input)
 
         # Add the date layout to the main container layout
@@ -688,7 +688,7 @@ class MyApp(QWidget):
     def add_data_to_table(self):
         # Get the category, date, and amount
         category = self.input_category.text().strip()
-        date = self.date_input.date().toString("yyyy-MM-dd")
+        date = self.date_input.date()  # This is already a QDate object, no need to convert it
         amount = self.input_amount.text().strip()
 
         # Make sure we have valid inputs
@@ -707,13 +707,13 @@ class MyApp(QWidget):
             self.table.insertRow(row_count)
             self.table.setItem(row_count, 0, QTableWidgetItem(str(new_id)))
             self.table.setItem(row_count, 1, QTableWidgetItem(category))
-            self.table.setItem(row_count, 2, QTableWidgetItem(date))
+            self.table.setItem(row_count, 2, QTableWidgetItem(date.toString("yyyy-MM-dd")))
             self.table.setItem(row_count, 3, QTableWidgetItem(f"€ {amount:,.2f}"))
 
         # Clear input fields
         self.input_category.clear()
         self.input_amount.clear()
-        self.date_input.setDate(date.today())
+        self.date_input.setDate(QDate.currentDate())
 
     def remove_data_from_table(self):
         # Get the selected row
