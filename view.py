@@ -1,71 +1,62 @@
 import sqlite3 as lite
+from PyQt5.QtWidgets import QMessageBox
 
-# Creating connection
-con = lite.connect('dados.db')
+# Database Connection Class
+class Database:
+    def __init__(self, db_name="dados.db"):
+        self.db_name = db_name
+        self.con = lite.connect(self.db_name)
+        self.con.row_factory = lite.Row  # To return data as dictionaries
 
-# insert operation
-def insert_category(i):
-    with con:
-        cur = con.cursor()
-        query = "INSERT INTO Category (name) VALUES (?)"
-        cur.execute(query, i)
+    def execute_query(self, query, params=()):
+        with self.con:
+            cur = self.con.cursor()
+            cur.execute(query, params)
+            self.con.commit()
+            return cur
 
-def insert_recipes(i):
-    with con:
-        cur = con.cursor()
-        query = "INSERT INTO Recipes (category, added_in, value) VALUES (?,?,?)"
-        cur.execute(query, i)
+    def fetchall_query(self, query, params=()):
+        with self.con:
+            cur = self.con.cursor()
+            cur.execute(query, params)
+            return cur.fetchall()
 
-def insert_Expenses(i):
-    with con:
-        cur = con.cursor()
-        query = "INSERT INTO Expenses (category, removed_in, value) VALUES (?,?,?)"
-        cur.execute(query, i)
+# Insert Methods
+def insert_category(category_name):
+    db = Database()
+    query = "INSERT INTO Category (name) VALUES (?)"
+    db.execute_query(query, (category_name,))
 
-# delete operations
-def delete_recipes(i):
-    with con:
-        cur = con.cursor()
-        query = query = "DELETE FROM Recipres WHERE id=?"
-        cur.execute(query, i)
+def insert_recipe(category, added_in, value):
+    db = Database()
+    query = "INSERT INTO Recipes (category, added_in, value) VALUES (?,?,?)"
+    db.execute_query(query, (category, added_in, value))
 
-def delete_Expenses(i):
-    with con:
-        cur = con.cursor()
-        query = "DELETE FROM Expenses WHERE id=?"
-        cur.execute(query, i)
+def insert_expense(category, removed_in, value):
+    db = Database()
+    query = "INSERT INTO Expenses (category, removed_in, value) VALUES (?,?,?)"
+    db.execute_query(query, (category, removed_in, value))
 
-# functions so we can see what we have inside the table
+# Delete Methods
+def delete_recipe(recipe_id):
+    db = Database()
+    query = "DELETE FROM Recipes WHERE id=?"
+    db.execute_query(query, (recipe_id,))
 
+def delete_expense(expense_id):
+    db = Database()
+    query = "DELETE FROM Expenses WHERE id=?"
+    db.execute_query(query, (expense_id,))
+
+# Fetching Data Methods
 def see_category():
-    list_items = []
-    with con:
-        cur = con.cursor()
-        cur.execute("SELECT * FROM Category")
-        rown = cur.fetchall()
-        for l in rown:
-            list_items.append(l)
-    return list_items
+    db = Database()
+    return db.fetchall_query("SELECT * FROM Category")
 
+def see_recipes():
+    db = Database()
+    return db.fetchall_query("SELECT * FROM Recipes")
 
-print(see_category())
-    
-def see_recipes(i):
-    list_items = []
-    with con:
-        cur = con.cursor()
-        cur.execute("SELECT * FROM Recipes")
-        rown = cur.fetchall()
-        for l in rown:
-            list_items.append(l)
-    return list_items
-
-def see_Expenses(i):
-    list_items = []
-    with con:
-        cur = con.cursor()
-        cur.execute("SELECT * FROM Expenses")
-        rown = cur.fetchall()
-        for l in rown:
-            list_items.append(l)
-    return list_items
+def see_expenses():
+    db = Database()
+    return db.fetchall_query("SELECT * FROM Expenses")

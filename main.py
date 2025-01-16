@@ -51,6 +51,17 @@ class MyApp(QWidget):
         frame_down = self.create_bottom_frame()
         layout.addWidget(frame_down)
 
+        # Assuming you have a button for receipt and expense
+        self.add_receipt_button = QPushButton("Add Receipt", self)
+        self.add_expense_button = QPushButton("Add Expense", self)
+
+        # Connect the buttons to their respective methods
+        self.add_receipt_button.clicked.connect(self.set_receipt_mode)
+        self.add_expense_button.clicked.connect(self.set_expense_mode)
+
+        # Track whether we are adding a receipt or an expense
+        self.is_expense = False
+
         # Set the main layout
         self.setLayout(layout)
         self.show()
@@ -685,6 +696,12 @@ class MyApp(QWidget):
 
         return container
 
+    def set_receipt_mode(self):
+        self.is_expense = False  # Set to receipt mode (positive amount)
+
+    def set_expense_mode(self):
+        self.is_expense = True  # Set to expense mode (negative amount)
+
     def add_data_to_table(self):
         # Get the category, date, and amount
         category = self.input_category.text().strip()
@@ -698,6 +715,10 @@ class MyApp(QWidget):
             except ValueError:
                 # If amount is not a valid number, show an error message
                 return
+
+            # Adjust amount based on whether it's an expense or receipt
+            if self.is_expense:
+                amount = -abs(amount)  # Make the amount negative if it's an expense
 
             # Find the next available ID (auto-increment)
             row_count = self.table.rowCount()
