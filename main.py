@@ -53,10 +53,6 @@ class MyApp(QWidget):
         frame_down = self.create_bottom_frame()
         layout.addWidget(frame_down)
 
-        # Assuming you have a button for receipt and expense
-        self.add_receipt_button = QPushButton("Add Receipt", self)
-        self.add_expense_button = QPushButton("Add Expense", self)
-
         # Connect the buttons to their respective methods
         self.add_receipt_button.clicked.connect(self.set_receipt_mode)
         self.add_expense_button.clicked.connect(self.set_expense_mode)
@@ -132,20 +128,55 @@ class MyApp(QWidget):
         frame_down.setStyleSheet(
             f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;"
         )
-        frame_down.setFixedHeight(300)
+
+        # Create the main horizontal layout for the frame
         frame_down_layout = QHBoxLayout(frame_down)
 
-        # Tables Container
+        # Left Section for tables_container
         tables_container = self.create_tables_container()
-        frame_down_layout.addWidget(tables_container)
+        frame_down_layout.addWidget(tables_container, 1)  # 1 indicates it takes flexible space
+
+        # Right Section - for the crud_container, configurations_container, and remove button
+        right_layout = QVBoxLayout()
+
+        # Create a horizontal layout to hold the crud_container and configurations_container
+        horizontal_layout = QHBoxLayout()
 
         # CRUD Container
         crud_container = self.create_crud_container("Enter new expenses:")
-        frame_down_layout.addWidget(crud_container)
+        horizontal_layout.addWidget(crud_container)
 
         # Configurations Container
         configurations_container = self.create_configurations_container("Enter new recipes:")
-        frame_down_layout.addWidget(configurations_container)
+        horizontal_layout.addWidget(configurations_container)
+
+        # Add the horizontal layout to the right_layout
+        right_layout.addLayout(horizontal_layout)
+
+        # Remove Rows Button
+        remove_button = QPushButton("Remove Selected Row", self)
+        remove_button.clicked.connect(self.remove_selected_row)  # Connect to your function to remove rows
+        remove_button.setStyleSheet(
+            """
+            QPushButton {
+                font: 10px Verdana;
+                background-color: #F44336;
+                color: white;
+                border-radius: 5px;
+                padding: 10px;
+            }
+            QPushButton:hover {
+                background-color: #e53935;
+            }
+            QPushButton:pressed {
+                background-color: #d32f2f;
+            }
+            """
+        )
+        right_layout.addWidget(remove_button)  # Add the button under the containers
+
+        # Add the right layout to the frame_down_layout
+        frame_down_layout.addLayout(right_layout)
 
         return frame_down
 
@@ -467,8 +498,8 @@ class MyApp(QWidget):
         layout.addLayout(amount_layout)
 
         # Add Button to add the data to the table
-        self.add_button = QPushButton("Add", self)
-        self.add_button.setStyleSheet(
+        self.add_expense_button = QPushButton("Add", self)
+        self.add_expense_button.setStyleSheet(
             """
             QPushButton {
                 font: 10px Verdana;
@@ -485,32 +516,7 @@ class MyApp(QWidget):
             }
             """
         )
-        layout.addWidget(self.add_button)
-
-        # Add Button to remove selected
-        self.remove_button = QPushButton("Remove", self)
-        self.remove_button.setStyleSheet(
-            """
-            QPushButton {
-                font: 10px Verdana;
-                background-color: #F44336;
-                color: white;
-                border-radius: 5px;
-                padding: 10px;
-            }
-            QPushButton:hover {
-                background-color: #e53935;
-            }
-            QPushButton:pressed {
-                background-color: #d32f2f;
-            }
-            """
-        )
-        layout.addWidget(self.remove_button)
-
-        # Connect the add and remove buttons to their respective functions
-        self.add_button.clicked.connect(self.add_data_to_table)
-        self.remove_button.clicked.connect(self.remove_data_from_table)
+        layout.addWidget(self.add_expense_button)
 
         return container
 
@@ -624,27 +630,6 @@ class MyApp(QWidget):
         # Add the horizontal layout to the main container layout
         layout.addLayout(total_amount_layout)
 
-        # Add Button to add the data to the table
-        self.add_button = QPushButton("Add", self)
-        self.add_button.setStyleSheet(
-            """
-            QPushButton {
-                font: 10px Verdana;
-                background-color: #4CAF50;
-                color: white;
-                border-radius: 5px;
-                padding: 10px;
-            }
-            QPushButton:hover {
-                background-color: #45a049;
-            }
-            QPushButton:pressed {
-                background-color: #388e3c;
-            }
-            """
-        )
-        layout.addWidget(self.add_button)
-
          # Horizontal layout for category label and input
         category_layout = QHBoxLayout()
         category_layout.setSpacing(10)  # Set 10px spacing between widgets
@@ -674,13 +659,13 @@ class MyApp(QWidget):
         layout.addLayout(category_layout)
 
 
-        # Add Button to add the data to the table
-        self.add_button = QPushButton("Add", self)
-        self.add_button.setStyleSheet(
+       # Add Button to add the data to the table
+        self.add_receipt_button = QPushButton("Add", self)
+        self.add_receipt_button.setStyleSheet(
             """
             QPushButton {
                 font: 10px Verdana;
-                background-color: #4CAF50;
+                background-color: #4CAF50; 
                 color: white;
                 border-radius: 5px;
                 padding: 10px;
@@ -693,7 +678,7 @@ class MyApp(QWidget):
             }
             """
         )
-        layout.addWidget(self.add_button)
+        layout.addWidget(self.add_receipt_button)
 
 
         return container
@@ -725,20 +710,29 @@ class MyApp(QWidget):
             self.update_table()
             self.clear_inputs()
 
-    def remove_data_from_table(self):
-        selected_row = self.table.currentRow()
-        if selected_row >= 0:
-            item_id = self.table.item(selected_row, 0).text()  # Assuming the ID is in the first column
-            item_id = int(item_id)
+    def remove_selected_row(self):
+        selected_row = self.table.currentRow()  # Get the row index of the selected row
+        
+        if selected_row >= 0:  # Ensure a row is selected
+            # Assuming that the ID of the record is in the first column (index 0)
+            item_id = self.table.item(selected_row, 0).text()  # Get the ID from the first column
+            item_id = int(item_id)  # Convert the ID to an integer for deletion
 
-            # Check if it's a recipe or expense
-            if self.is_expense:
-                delete_expense(item_id)
+            # Check whether it's a recipe or expense
+            if self.is_expense:  # Assuming `self.is_expense` determines whether it's an expense or recipe
+                delete_expense(item_id)  # Delete from the Expenses table
             else:
-                delete_recipe(item_id)
+                delete_recipe(item_id)  # Delete from the Recipes table
 
-            # Reload the table or UI after removing data
+            # After deletion, update the table to reflect the changes
             self.update_table()
+
+            # Optional: Show a confirmation message
+            QMessageBox.information(self, "Deleted", "Record deleted successfully.")
+        else:
+            # Handle case when no row is selected
+            QMessageBox.warning(self, "No Selection", "Please select a row to delete.")
+        pass
 
     def update_table(self):
         """ Refresh the data shown in the table. """
@@ -757,14 +751,6 @@ class MyApp(QWidget):
             for col_idx, col_data in enumerate(row_data):
                 self.table.setItem(row_position, col_idx, QTableWidgetItem(str(col_data)))
 
-
-    def add_category(self):
-        # Get the selected category
-        selected_category = self.combo_category.currentText()
-        if selected_category and selected_category not in self.selected_categories:
-            # Add it to the list and the QListWidget
-            self.selected_categories.append(selected_category)
-            self.list_widget.addItem(selected_category)
 
 # Main execution
 if __name__ == "__main__":
