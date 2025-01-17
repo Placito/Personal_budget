@@ -714,30 +714,31 @@ class MyApp(QWidget):
         selected_row = self.table.currentRow()  # Get the row index of the selected row
         
         if selected_row >= 0:  # Ensure a row is selected
-            # Assuming that the ID of the record is in the first column (index 0)
-            item_id = self.table.item(selected_row, 0).text()  # Get the ID from the first column
-            item_id = int(item_id)  # Convert the ID to an integer for deletion
+            # Get the ID of the selected row (assuming ID is in the first column)
+            item_id = self.table.item(selected_row, 0).text()
+            
+            try:
+                item_id = int(item_id)  # Convert the ID to an integer for deletion
+                
+                # Check whether to delete from Expenses or Recipes table
+                if self.is_expense:
+                    delete_expense(item_id)  # Delete from the Expenses table
+                else:
+                    delete_recipe(item_id)  # Delete from the Recipes table
 
-            # Check whether it's a recipe or expense
-            if self.is_expense:  # Assuming `self.is_expense` determines whether it's an expense or recipe
-                delete_expense(item_id)  # Delete from the Expenses table
-            else:
-                delete_recipe(item_id)  # Delete from the Recipes table
+                # Remove the row from the table
+                self.table.removeRow(selected_row)
 
-            # After deletion, update the table to reflect the changes
-            self.update_table()
-
-            # Optional: Show a confirmation message
-            QMessageBox.information(self, "Deleted", "Record deleted successfully.")
+                # Optional: Show a confirmation message
+                QMessageBox.information(self, "Deleted", "Record deleted successfully.")
+            except ValueError:
+                QMessageBox.warning(self, "Error", "Failed to delete the selected row. Invalid ID.")
         else:
             # Handle case when no row is selected
             QMessageBox.warning(self, "No Selection", "Please select a row to delete.")
-        pass
 
     def update_table(self):
         """ Refresh the data shown in the table. """
-        # Clear existing table rows
-        self.table.setRowCount(0)
         # Fetch updated data from the database
         if self.is_expense:
             data = see_expenses()
