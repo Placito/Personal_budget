@@ -613,7 +613,7 @@ class MyApp(QWidget):
 
         # Input field for Total Amount with placeholder
         self.input_total_amount = QLineEdit(self)
-        self.input_total_amount.setPlaceholderText("Enter here...")  # Placeholder text
+        self.input_total_amount.setPlaceholderText("Enter amount here...")  # Placeholder text
         self.input_total_amount.setStyleSheet(
             """
             QLineEdit {
