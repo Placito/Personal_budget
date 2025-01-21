@@ -607,7 +607,7 @@ class MyApp(QWidget):
         total_amount_layout.setSpacing(10)  # Set 10px spacing between widgets
 
         # Label for Total Amountt input
-        label_total_amount = QLabel("Total Amount:", self)
+        label_total_amount = QLabel("Total:", self)
         label_total_amount.setStyleSheet("font: 10px Verdana; color: black;")
         total_amount_layout.addWidget(label_total_amount)
 
