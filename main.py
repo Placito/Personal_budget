@@ -163,6 +163,7 @@ class MyApp(QWidget):
                 background-color: #F44336;
                 color: white;
                 border-radius: 5px;
+                border: none;
                 padding: 10px;
             }
             QPushButton:hover {
@@ -173,7 +174,14 @@ class MyApp(QWidget):
             }
             """
         )
-        right_layout.addWidget(remove_button)  # Add the button under the containers
+        remove_button.setFixedWidth(495)  # Explicitly set the width of the button
+
+        # Create a layout to center the button
+        center_layout = QVBoxLayout()
+        center_layout.addWidget(remove_button, alignment=Qt.AlignCenter)  # Center the button
+
+        # Add the center layout to the right_layout
+        right_layout.addLayout(center_layout)
 
         # Add the right layout to the frame_down_layout
         frame_down_layout.addLayout(right_layout)
