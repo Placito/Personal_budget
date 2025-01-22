@@ -11,7 +11,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 
 from view import delete_expense, delete_recipe, insert_expense, insert_recipe, see_expenses, see_recipes
-
+from models import Database
 
 # Colors
 c0 = "#2e2d2b"  # black
