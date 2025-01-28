@@ -374,14 +374,12 @@ class MyApp(QWidget):
         category_layout.addWidget(label_category)
 
         # Dropdown (ComboBox) for selecting a category
-        self.input_category = QComboBox(self)
-        self.input_category.addItems(self.categories)  # Add categories to the dropdown
+        self.input_category_crud = QComboBox(self)
+        self.input_category_crud.addItems(self.categories)  # Add categories to the dropdown
 
-        # Set default value (e.g., first category)
-        default_index = 0  # Change this to the desired index of the default value"
-        self.input_category.setCurrentIndex(default_index)
-
-        self.input_category.setStyleSheet(
+        # Set default value
+        self.input_category_crud.setCurrentIndex(0)  # Default index
+        self.input_category_crud.setStyleSheet(
             """
             QComboBox {
                 font: 10px Verdana;
@@ -391,31 +389,22 @@ class MyApp(QWidget):
                 color: black;
                 width: 180px;
             }
-            QComboBox::drop-down {
-                border: 0px;
-            }
             """
         )
-
-        category_layout.addWidget(self.input_category)
-
-        # Add the horizontal layout to the main container layout
+        category_layout.addWidget(self.input_category_crud)
         layout.addLayout(category_layout)
 
-        # Horizontal layout for date input with 10px spacing
+        # Date input
         date_layout = QHBoxLayout()
-        date_layout.setSpacing(10)
-
-        # Label for date input
         label_date = QLabel("Date:", self)
-        label_date.setStyleSheet("font: 10px Verdana; color: black; padding: 0px; margin: 0")
+        label_date.setStyleSheet("font: 10px Verdana; color: black;")
         date_layout.addWidget(label_date)
 
-        # Date input field with default current date
-        self.date_input = QDateEdit(self)
-        self.date_input.setCalendarPopup(True)  # Enable calendar dropdown
-        self.date_input.setDisplayFormat("yyyy-MM-dd")  # Format the date
-        self.date_input.setStyleSheet(
+        self.date_input_crud = QDateEdit(self)
+        self.date_input_crud.setCalendarPopup(True)
+        self.date_input_crud.setDisplayFormat("yyyy-MM-dd")
+        self.date_input_crud.setDate(QDate.currentDate())
+        self.date_input_crud.setStyleSheet(
             """
             QDateEdit {
                 font: 10px Verdana;
@@ -465,31 +454,18 @@ class MyApp(QWidget):
                 background-color: #388e3c;
             }
         """)
-
-        # Set the current date as default
-        self.date_input.setDate(QDate.currentDate()) # Set current date
-        date_layout.addWidget(self.date_input)
-
-        # Add the date layout to the main container layout
+        date_layout.addWidget(self.date_input_crud)
         layout.addLayout(date_layout)
 
-        # List Widget to display added categories
-        # self.list_widget = QListWidget(self)
-        # layout.addWidget(self.list_widget)
-
-        # Horizontal layout for amount label and input with 10px spacing
+        # Amount input
         amount_layout = QHBoxLayout()
-        amount_layout.setSpacing(10)  # Set 10px spacing between widgets
-
-        # Label for amount input
         label_amount = QLabel("Total:", self)
         label_amount.setStyleSheet("font: 10px Verdana; color: black;")
         amount_layout.addWidget(label_amount)
 
-        # Input field for amount with placeholder
-        self.input_amount = QLineEdit(self)
-        self.input_amount.setPlaceholderText("Enter amount here...")  # Placeholder text
-        self.input_amount.setStyleSheet(
+        self.input_amount_crud = QLineEdit(self)
+        self.input_amount_crud.setPlaceholderText("Enter amount here...")
+        self.input_amount_crud.setStyleSheet(
             """
             QLineEdit {
                 font: 10px Verdana;
@@ -500,13 +476,18 @@ class MyApp(QWidget):
             }
             """
         )
-        amount_layout.addWidget(self.input_amount)
-
-        # Add the horizontal layout to the main container layout
+        amount_layout.addWidget(self.input_amount_crud)
         layout.addLayout(amount_layout)
 
-        # Add Button to add the data to the table
+        # Add Button
         self.add_expense_button = QPushButton("Add", self)
+        self.add_expense_button.clicked.connect(
+            lambda: self.add_data_to_table(
+                category=self.input_category_crud.currentText().strip(),
+                date=self.date_input_crud.date().toString("yyyy-MM-dd"),
+                amount=self.input_amount_crud.text().strip(),
+            )
+        )
         self.add_expense_button.setStyleSheet(
             """
             QPushButton {
@@ -527,6 +508,7 @@ class MyApp(QWidget):
         layout.addWidget(self.add_expense_button)
 
         return container
+
 
     def create_configurations_container(self, widget_title):
         container = QWidget(self)
@@ -549,10 +531,10 @@ class MyApp(QWidget):
         date_layout.addWidget(label_date)
 
         # Date input field with default current date
-        self.date_input = QDateEdit(self)
-        self.date_input.setCalendarPopup(True)  # Enable calendar dropdown
-        self.date_input.setDisplayFormat("yyyy-MM-dd")  # Format the date
-        self.date_input.setStyleSheet(
+        self.date_input_configurations = QDateEdit(self)
+        self.date_input_configurations.setCalendarPopup(True)  # Enable calendar dropdown
+        self.date_input_configurations.setDisplayFormat("yyyy-MM-dd")  # Format the date
+        self.date_input_configurations.setStyleSheet(
             """
             QDateEdit {
                 font: 10px Verdana;
@@ -604,8 +586,8 @@ class MyApp(QWidget):
         """)
 
         # Set the current date as default
-        self.date_input.setDate(QDate.currentDate()) # Set current date
-        date_layout.addWidget(self.date_input)
+        self.date_input_configurations.setDate(QDate.currentDate()) # Set current date
+        date_layout.addWidget(self.date_input_configurations)
 
         # Add the date layout to the main container layout
         layout.addLayout(date_layout)
@@ -620,9 +602,9 @@ class MyApp(QWidget):
         total_amount_layout.addWidget(label_total_amount)
 
         # Input field for Total Amount with placeholder
-        self.input_total_amount = QLineEdit(self)
-        self.input_total_amount.setPlaceholderText("Enter amount here...")  # Placeholder text
-        self.input_total_amount.setStyleSheet(
+        self.input_total_amount_configurations = QLineEdit(self)
+        self.input_total_amount_configurations.setPlaceholderText("Enter amount here...")  # Placeholder text
+        self.input_total_amount_configurations.setStyleSheet(
             """
             QLineEdit {
                 font: 10px Verdana;
@@ -633,7 +615,7 @@ class MyApp(QWidget):
             }
             """
         )
-        total_amount_layout.addWidget(self.input_total_amount)
+        total_amount_layout.addWidget(self.input_total_amount_configurations)
 
         # Add the horizontal layout to the main container layout
         layout.addLayout(total_amount_layout)
@@ -647,28 +629,37 @@ class MyApp(QWidget):
         label_category.setStyleSheet("font: 10px Verdana; color: black;")
         category_layout.addWidget(label_category)
 
-        # Input field for category with placeholder
-        self.input_category = QLineEdit(self)
-        self.input_category.setPlaceholderText("Enter category here...")  # Placeholder text
-        self.input_category.setStyleSheet(
+        # Dropdown (ComboBox) for selecting a category
+        self.input_category_configurations = QComboBox(self)
+        self.input_category_configurations.addItems(self.categories)  # Add categories to the dropdown
+
+        # Set default value
+        self.input_category_configurations.setCurrentIndex(0)  # Default index
+        self.input_category_configurations.setStyleSheet(
             """
-            QLineEdit {
+            QComboBox {
                 font: 10px Verdana;
                 border: 1px solid #ccc;
                 border-radius: 5px;
                 padding: 5px;
                 color: black;
+                width: 180px;
             }
             """
         )
-        category_layout.addWidget(self.input_category)
-
-        # Add the horizontal layout to the main container layout
+        category_layout.addWidget(self.input_category_configurations)
         layout.addLayout(category_layout)
-
 
        # Add Button to add the data to the table
         self.add_receipt_button = QPushButton("Add", self)
+        self.add_receipt_button.clicked.connect(
+            lambda: self.add_data_to_table(
+                category=self.input_category_config.text().strip(),
+                date=self.date_input.date().toString("yyyy-MM-dd"),
+                amount=self.input_total_amount.text().strip(),
+            )
+        )
+
         self.add_receipt_button.setStyleSheet(
             """
             QPushButton {
@@ -688,35 +679,62 @@ class MyApp(QWidget):
         )
         layout.addWidget(self.add_receipt_button)
 
-
         return container
 
     def set_receipt_mode(self):
-        self.is_expense = False  # Set to receipt mode (positive amount)
+        self.is_expense = False
+        print("Receipt mode activated")
 
     def set_expense_mode(self):
-        self.is_expense = True  # Set to expense mode (negative amount)
+        self.is_expense = True
+        print("Expense mode activated")
 
-    def add_data_to_table(self):
-        category = self.input_category.text().strip()
-        date = self.date_input.date().toString("yyyy-MM-dd")  # Get date as string
-        amount = self.input_amount.text().strip()
+    def add_data_to_table(self, category, date, amount):
+        if not category or not amount:  # Check for empty inputs
+            QMessageBox.warning(self, "Missing Data", "Please fill out all fields.")
+            return
 
-        if category and date and amount:
-            try:
-                amount = float(amount)  # Convert amount to a number
-            except ValueError:
-                return  # Handle the error appropriately here
+        try:
+            amount_value = float(amount)  # Convert amount to float
+        except ValueError:
+            QMessageBox.warning(self, "Invalid Amount", "Amount must be a valid number.")
+            return
 
-            # Insert data into the Recipes or Expenses table (depending on your use case)
-            if self.is_expense:  # Assuming you have a flag to check whether it's expense or recipe
-                insert_expense(category, date, amount)
-            else:
-                insert_recipe(category, date, amount)
+        # Determine if it's an expense (negative) or receipt (positive)
+        amount_value = -amount_value if self.is_expense else amount_value
 
-            # Reload the table or UI after adding data
-            self.update_table()
-            self.clear_inputs()
+        # Add data to the table
+        self.add_row_to_table(category, date, f"{amount_value:.2f}")
+
+        # Optional: Clear inputs
+        self.clear_inputs()
+        QMessageBox.information(self, "Success", "Data added to the table successfully.")
+
+        # Force Table Refresh
+        self.table.viewport().update()
+
+    def add_row_to_table(self, category, date, amount):
+        print(f"Adding row: Category={category}, Date={date}, Amount={amount}")
+        print(f"Current row count before: {self.table.rowCount()}")  # Debugging row count
+
+        # Insert a new row at the end of the table
+        row_count = self.table.rowCount()
+        self.table.insertRow(row_count)
+
+        # Add items to the respective columns
+        self.table.setItem(row_count, 0, QTableWidgetItem(category))
+        self.table.setItem(row_count, 1, QTableWidgetItem(date))
+        self.table.setItem(row_count, 2, QTableWidgetItem(amount))
+
+        print(f"Current row count after: {self.table.rowCount()}")  # Debugging row count after
+
+    def clear_inputs(self):
+        self.input_category_crud.clear()
+        self.input_category_configurations.clear()
+        self.input_amount_crud.clear()
+        self.input_total_amount_configurations.clear()
+        self.date_input_crud.setDate(QDate.currentDate())
+        self.date_input_configurations.setDate(QDate.currentDate())
 
     def remove_selected_row(self):
         selected_row = self.table.currentRow()  # Get the row index of the selected row
@@ -747,6 +765,9 @@ class MyApp(QWidget):
 
     def update_table(self):
         """ Refresh the data shown in the table. """
+        # Clear existing rows
+        self.table.setRowCount(0)
+
         # Fetch updated data from the database
         if self.is_expense:
             data = see_expenses()
@@ -760,6 +781,9 @@ class MyApp(QWidget):
             for col_idx, col_data in enumerate(row_data):
                 self.table.setItem(row_position, col_idx, QTableWidgetItem(str(col_data)))
 
+        # Refresh the table layout
+        self.table.update()
+        self.table.resizeRowsToContents()
 
 # Main execution
 if __name__ == "__main__":
