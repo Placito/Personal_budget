@@ -34,6 +34,18 @@ def add_expense(category, removed_in, value):
         con.commit()
         print(f"Expense added successfully: {category}, {removed_in}, {value}")
 
+def remove_category(category_name):
+    con = lite.connect("dados.db")
+    with con:
+        cur = con.cursor()
+        # Remove entries from Recipes and Expenses tables
+        cur.execute("DELETE FROM Recipes WHERE category = ?", (category_name,))
+        cur.execute("DELETE FROM Expenses WHERE category = ?", (category_name,))
+        # Remove the category from the Category table
+        cur.execute("DELETE FROM Category WHERE name = ?", (category_name,))
+        con.commit()
+        print(f"Category '{category_name}' and its associated entries removed successfully.")
+
 if __name__ == "__main__":
     # View data in tables
     print("Categories:")
@@ -47,3 +59,6 @@ if __name__ == "__main__":
     categories = ["Travel", "Food", "Entertainment", "Rent", "Shopping", "Water", "Electricity", "Car", "Transportation, Salary"]
     for category in categories:
         add_category(category)
+
+    # Remove the 'Utilities' category
+    remove_category("Utilities")
