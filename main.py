@@ -738,31 +738,55 @@ class MyApp(QWidget):
 
     def remove_selected_row(self):
         selected_row = self.table.currentRow()  # Get the row index of the selected row
+
+        # Explicitly check if no row is selected
+        if selected_row == 0 or selected_row == -1:  
+            self.show_warning("No Selection", "Please select a row to delete.")
+            return  # Exit the function early
+
+        # Get the ID of the selected row (assuming ID is in the first column)
+        item = self.table.item(selected_row, 0)
         
-        if selected_row >= 0:  # Ensure a row is selected
-            # Get the ID of the selected row (assuming ID is in the first column)
-            item_id = self.table.item(selected_row, 0).text()
+        if item is None:  # Prevent deleting if there's no valid item
+            self.show_warning("Error", "Failed to delete the selected row. No valid ID found.")
+            return
+        
+        item_id = item.text().strip()
+        
+        try:
+            item_id = int(item_id)  # Convert the ID to an integer for deletion
             
-            try:
-                item_id = int(item_id)  # Convert the ID to an integer for deletion
-                
-                # Check whether to delete from Expenses or Recipes table
-                if self.is_expense:
-                    delete_expense(item_id)  # Delete from the Expenses table
-                else:
-                    delete_recipe(item_id)  # Delete from the Recipes table
+            # Check whether to delete from Expenses or Recipes table
+            if self.is_expense:
+                delete_expense(item_id)  # Delete from the Expenses table
+            else:
+                delete_recipe(item_id)  # Delete from the Recipes table
 
-                # Remove the row from the table
-                self.table.removeRow(selected_row)
+            # Remove the row from the table
+            self.table.removeRow(selected_row)
 
-                # Optional: Show a confirmation message
-                QMessageBox.information(self, "Deleted", "Record deleted successfully.")
-            except ValueError:
-                QMessageBox.warning(self, "Error", "Failed to delete the selected row. Invalid ID.")
-        else:
-            # Handle case when no row is selected
-            QMessageBox.warning(self, "No Selection", "Please select a row to delete.")
+            # Show a confirmation message
+            self.show_message("Deleted", "Record deleted successfully.")
+        except ValueError:
+            self.show_warning("Error", "Failed to delete the selected row. Invalid ID.")
 
+    # Helper methods to show styled QMessageBox
+    def show_message(self, title, text):
+        msg = QMessageBox(self)
+        msg.setStyleSheet("QLabel { color: black; }")  # Ensure text is black
+        msg.setIcon(QMessageBox.Information)
+        msg.setWindowTitle(title)
+        msg.setText(text)
+        msg.exec_()
+
+    def show_warning(self, title, text):
+        msg = QMessageBox(self)
+        msg.setStyleSheet("QLabel { color: black; }")  # Ensure text is black
+        msg.setIcon(QMessageBox.Warning)
+        msg.setWindowTitle(title)
+        msg.setText(text)
+        msg.exec_()
+        
     def update_table(self):
         """ Refresh the data shown in the table. """
         # Clear existing rows
