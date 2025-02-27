@@ -30,6 +30,11 @@ class MyApp(QWidget):
     def __init__(self):
         super().__init__()
 
+        # Initialize totals
+        self.total_income = 0
+        self.total_expenses = 0
+        self.total_balance = 0
+
         # Define categories and selected_categories
         self.categories = ['Choose a category', 'Travel', 'Food', 'Entertainment', 'Shopping']
         self.selected_categories = []
@@ -217,11 +222,10 @@ class MyApp(QWidget):
         layout.addWidget(label_percentage)
 
         progress_layout = QHBoxLayout()
-        bar = QProgressBar(container)
-        bar.setRange(0, 100)
-        bar.setValue(50)
-        bar.setTextVisible(False)
-        bar.setStyleSheet(
+        self.progress_bar = QProgressBar(container)
+        self.progress_bar.setRange(0, 100)
+        self.progress_bar.setTextVisible(False)
+        self.progress_bar.setStyleSheet(
             f"""
             QProgressBar {{
                 background-color: {c9};
@@ -234,15 +238,23 @@ class MyApp(QWidget):
             }}
             """
         )
-        bar.setFixedSize(120, 20)
-        progress_layout.addWidget(bar)
+        self.progress_bar.setFixedSize(120, 20)
+        progress_layout.addWidget(self.progress_bar)
 
-        percentage_label = QLabel("50%", self)
-        percentage_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0}; border: none;")
-        progress_layout.addWidget(percentage_label)
+        self.percentage_label = QLabel("0%", self)
+        self.percentage_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0}; border: none;")
+        progress_layout.addWidget(self.percentage_label)
         layout.addLayout(progress_layout)
 
         return container
+
+    def update_progress_bar(self):
+        if self.total_income > 0:
+            percentage_spent = (self.total_expenses / self.total_income) * 100
+        else:
+            percentage_spent = 0
+        self.progress_bar.setValue(percentage_spent)
+        self.percentage_label.setText(f"{percentage_spent:.2f}%")
 
     def create_totals_container(self):
         """
@@ -255,13 +267,13 @@ class MyApp(QWidget):
         layout = QVBoxLayout(container)
 
         # Total Income
-        self.add_total_item(layout, "Total Monthly Income", 500)
+        self.add_total_item(layout, "Total Monthly Income", self.total_income)
 
         # Total Expenses
-        self.add_total_item(layout, "Total Monthly Expenses", 600)
+        self.add_total_item(layout, "Total Monthly Expenses", self.total_expenses)
 
         # Total Balance
-        self.add_total_item(layout, "Total Cash Balance", 420)
+        self.add_total_item(layout, "Total Cash Balance", self.total_income - self.total_expenses)
 
         return container
 
@@ -278,11 +290,22 @@ class MyApp(QWidget):
         figure = plt.Figure(figsize=(4, 3), dpi=100)
         ax = figure.add_subplot(111)
 
-        # Pie chart data
-        values = [345, 225, 534]
-        categories = ["Income", "Expenses", "Balance"]
-        colors = ["#4fa882", "#038cfc", "#e06636"]
-        explode = [0.05, 0.05, 0.05]
+        # Ensure values are non-negative
+        total_income = max(self.total_income, 0)
+        total_expenses = max(self.total_expenses, 0)
+        total_balance = max(total_income - total_expenses, 0)
+
+        # Handle the case where all values are zero
+        if total_income == 0 and total_expenses == 0 and total_balance == 0:
+            values = [1]  # Dummy value to avoid division by zero
+            categories = ["No Data"]
+            colors = ["#d3d3d3"]
+            explode = [0]
+        else:
+            values = [total_income, total_expenses, total_balance]
+            categories = ["Income", "Expenses", "Balance"]
+            colors = ["#4fa882", "#038cfc", "#e06636"]
+            explode = [0.05, 0.05, 0.05]
 
         # Plot pie chart
         wedges, texts, autotexts = ax.pie(
@@ -291,7 +314,7 @@ class MyApp(QWidget):
             colors=colors,
             explode=explode,
             startangle=90,
-            wedgeprops={"width": 0.4, "edgecolor": "white"}
+            wedgeprops={"width": 0.2, "edgecolor": "white"}
         )
 
         # Add legend to the side
@@ -633,7 +656,7 @@ class MyApp(QWidget):
         total_amount_layout = QHBoxLayout()
         total_amount_layout.setSpacing(10)  # Set 10px spacing between widgets
 
-        # Label for Total Amountt input
+        # Label for Total Amount input
         label_total_amount = QLabel("Total:", self)
         label_total_amount.setStyleSheet("font: 10px Verdana; color: black;")
         total_amount_layout.addWidget(label_total_amount)
@@ -730,24 +753,40 @@ class MyApp(QWidget):
 
     def add_data_to_table(self, category, date, amount):
         if not category or not amount:  # Check for empty inputs
-            self.show_warning( "Missing Data", "Please fill out all fields.")
+            self.show_warning("Missing Data", "Please fill out all fields.")
             return
 
         try:
             amount_value = float(amount)  # Convert amount to float
         except ValueError:
-            self.show_warning( "Invalid Amount", "Amount must be a valid number.")
+            self.show_warning("Invalid Amount", "Amount must be a valid number.")
             return
 
         # Determine if it's an expense (negative) or receipt (positive)
         amount_value = -amount_value if self.is_expense else amount_value
 
+        # Add data to the database
+        if self.is_expense:
+            insert_expense(category, date, amount_value)
+            self.total_expenses += amount_value
+        else:
+            insert_recipe(category, date, amount_value)
+            self.total_income += amount_value
+
+        # Update total balance
+        self.total_balance = self.total_income - self.total_expenses
+
         # Add data to the table
         self.add_row_to_table(category, date, f"{amount_value:.2f}")
 
+        # Update UI elements
+        self.update_totals()
+        self.update_progress_bar()
+        self.update_circular_chart()
+
         # Optional: Clear inputs
         self.clear_inputs()
-        self.show_message( "Success", "Data added to the table successfully.")
+        self.show_message("Success", "Data added to the table successfully.")
 
     def add_row_to_table(self, category, date, amount):
         print(f"Adding row: Category={category}, Date={date}, Amount={amount}")
@@ -803,17 +842,42 @@ class MyApp(QWidget):
             # Check whether to delete from Expenses or Recipes table
             if self.is_expense:
                 delete_expense(item_id)  # Delete from the Expenses table
+                self.total_expenses -= float(self.table.item(selected_row, 3).text())
             else:
                 delete_recipe(item_id)  # Delete from the Recipes table
+                self.total_income -= float(self.table.item(selected_row, 3).text())
+
+            # Update total balance
+            self.total_balance = self.total_income - self.total_expenses
 
             # Remove the row from the table
-
             self.table.removeRow(selected_row)
+
+            # Update UI elements
+            self.update_totals()
+            self.update_progress_bar()
+            self.update_circular_chart()
 
             # Show a confirmation message
             self.show_message("Deleted", "Record deleted successfully.")
         except ValueError:
             self.show_warning("Error", "Failed to delete the selected row. Invalid ID.")
+
+    def update_totals(self):
+        # Refresh the totals container
+        totals_container = self.create_totals_container()
+        self.layout().itemAt(1).itemAt(1).widget().layout().replaceWidget(
+            self.layout().itemAt(1).itemAt(1).widget(), totals_container
+        )
+        totals_container.show()
+
+    def update_circular_chart(self):
+        # Refresh the circular chart container
+        circular_container = self.create_circular_container()
+        self.layout().itemAt(1).itemAt(2).widget().layout().replaceWidget(
+            self.layout().itemAt(1).itemAt(2).widget(), circular_container
+        )
+        circular_container.show()
 
     # Helper methods to show styled QMessageBox
     def show_message(self, title, text):
