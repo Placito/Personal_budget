@@ -67,6 +67,9 @@ class MyApp(QWidget):
         self.show()
 
     def create_top_frame(self):
+        """
+        Create the top frame of the application which includes the logo and title.
+        """
         frame_up = QFrame(self)
         frame_up.setStyleSheet(
             f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;"
@@ -103,6 +106,10 @@ class MyApp(QWidget):
         return frame_up
 
     def create_middle_frame(self):
+        """
+        Create the middle frame of the application which includes the progress chart,
+        totals container, and circular chart.
+        """
         frame_middle = QFrame(self)
         frame_middle.setStyleSheet(
             f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;"
@@ -126,6 +133,10 @@ class MyApp(QWidget):
         return frame_middle
 
     def create_bottom_frame(self):
+        """
+        Create the bottom frame of the application which includes the tables container,
+        CRUD container, configurations container, and remove button.
+        """
         frame_down = QFrame(self)
         frame_down.setStyleSheet(
             f"background-color: {c1}; border: 3px solid {c2}; border-radius: 6px;"
@@ -191,6 +202,9 @@ class MyApp(QWidget):
         return frame_down
 
     def create_progress_chart_container(self):
+        """
+        Create the progress chart container which includes a progress bar and percentage label.
+        """
         container = QWidget(self)
         container.setFixedWidth(200)
         container.setFixedHeight(100)
@@ -231,6 +245,9 @@ class MyApp(QWidget):
         return container
 
     def create_totals_container(self):
+        """
+        Create the totals container which includes total income, total expenses, and total balance.
+        """
         container = QWidget(self)
         container.setFixedWidth(210)
         container.setFixedHeight(200)
@@ -249,6 +266,9 @@ class MyApp(QWidget):
         return container
 
     def create_circular_container(self):
+        """
+        Create the circular chart container which includes a pie chart showing income, expenses, and balance.
+        """
         container = QWidget(self)
         container.setFixedWidth(500)
         container.setStyleSheet("border: none;")
@@ -291,17 +311,23 @@ class MyApp(QWidget):
         return container
 
     def add_total_item(self, layout, title, value):
-            label_title = QLabel(title.upper(), self)
-            label_title.setStyleSheet(f"font: bold 12px Verdana; color: #83a9e6; border: none;")
-            layout.addWidget(label_title)
+        """
+        Add a total item to the totals container.
+        """
+        label_title = QLabel(title.upper(), self)
+        label_title.setStyleSheet(f"font: bold 12px Verdana; color: #83a9e6; border: none;")
+        layout.addWidget(label_title)
 
-            label_value = QLabel(f"€ {value:,.2f}".upper(), self)
-            label_value.setStyleSheet(
-                f"font: bold 17px Arial; color: #545454; border-top: 1px solid {c0};"
-            )
-            layout.addWidget(label_value)
+        label_value = QLabel(f"€ {value:,.2f}".upper(), self)
+        label_value.setStyleSheet(
+            f"font: bold 17px Arial; color: #545454; border-top: 1px solid {c0};"
+        )
+        layout.addWidget(label_value)
 
     def create_tables_container(self):
+        """
+        Create the tables container which includes a table for displaying income and expenses.
+        """
         container = QWidget(self)
         container.setFixedWidth(300)
         container.setStyleSheet("border: none;")
@@ -357,6 +383,10 @@ class MyApp(QWidget):
         return container
     
     def create_crud_container(self, widget_title):
+        """
+        Create the CRUD container which includes inputs for category, date, and amount,
+        and a button to add the data to the table.
+        """
         container = QWidget(self)
         container.setStyleSheet("border: none;")
         container.setFixedWidth(250)
@@ -514,6 +544,10 @@ class MyApp(QWidget):
 
 
     def create_configurations_container(self, widget_title):
+        """
+        Create the configurations container which includes inputs for date, total amount, and category,
+        and a button to add the data to the table.
+        """
         container = QWidget(self)
         container.setStyleSheet("border: none;")
         container.setFixedWidth(250)
