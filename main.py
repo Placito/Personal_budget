@@ -71,8 +71,11 @@ class MyApp(QWidget):
         self.setLayout(layout)
         self.show()
 
-        # Add initial data
+        # Add initial data if not already present
         self.add_initial_data()
+
+        # Load initial data into the table
+        self.load_initial_data()
 
     def fetch_categories(self):
         db = Database()
@@ -80,6 +83,12 @@ class MyApp(QWidget):
         return ['Choose a category'] + [category['name'] for category in categories]
 
     def add_initial_data(self):
+        db = Database()
+        # Check if initial data already exists
+        existing_data = db.fetchall_query("SELECT * FROM Recipes WHERE category = 'Salary' AND added_in = '2025-01-01'")
+        if existing_data:
+            return  # Initial data already exists, no need to add it again
+
         initial_data = [
             {"category": "Salary", "date": "2025-01-01", "amount": 3000, "is_expense": False},
             {"category": "Rent", "date": "2025-01-05", "amount": -1200, "is_expense": True},
@@ -88,8 +97,30 @@ class MyApp(QWidget):
         ]
 
         for data in initial_data:
-            self.is_expense = data["is_expense"]
-            self.add_data_to_table(data["category"], data["date"], str(data["amount"]))
+            if data["is_expense"]:
+                insert_expense(data["category"], data["date"], data["amount"])
+            else:
+                insert_recipe(data["category"], data["date"], data["amount"])
+
+    def load_initial_data(self):
+        # Load initial data into the table without showing the "Success" message
+        db = Database()
+        recipes = db.fetchall_query("SELECT * FROM Recipes")
+        expenses = db.fetchall_query("SELECT * FROM Expenses")
+
+        for recipe in recipes:
+            self.add_row_to_table(recipe["category"], recipe["added_in"], f"{recipe['value']:.2f}")
+
+        for expense in expenses:
+            self.add_row_to_table(expense["category"], expense["removed_in"], f"{expense['value']:.2f}")
+
+        # Update totals and charts
+        self.total_income = db.get_total_income()
+        self.total_expenses = db.get_total_expenses()
+        self.total_balance = self.total_income - self.total_expenses
+        self.update_totals()
+        self.update_progress_bar()
+        self.update_circular_chart()
 
     def create_top_frame(self):
         """
