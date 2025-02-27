@@ -44,6 +44,6 @@ if __name__ == "__main__":
     view_table_data("Expenses")
 
     # Add new categories
-    categories = ["Travel", "Food", "Entertainment", "Rent", "Shopping", "Water", "Electricity", "Car", "Transportation"]
+    categories = ["Travel", "Food", "Entertainment", "Rent", "Shopping", "Water", "Electricity", "Car", "Transportation, Salary"]
     for category in categories:
         add_category(category)

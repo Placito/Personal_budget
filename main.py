@@ -71,10 +71,25 @@ class MyApp(QWidget):
         self.setLayout(layout)
         self.show()
 
+        # Add initial data
+        self.add_initial_data()
+
     def fetch_categories(self):
         db = Database()
         categories = db.fetchall_query("SELECT name FROM Category")
         return ['Choose a category'] + [category['name'] for category in categories]
+
+    def add_initial_data(self):
+        initial_data = [
+            {"category": "Salary", "date": "2025-01-01", "amount": 3000, "is_expense": False},
+            {"category": "Rent", "date": "2025-01-05", "amount": -1200, "is_expense": True},
+            {"category": "Groceries", "date": "2025-01-10", "amount": -300, "is_expense": True},
+            {"category": "Freelance Work", "date": "2025-01-15", "amount": 800, "is_expense": False}
+        ]
+
+        for data in initial_data:
+            self.is_expense = data["is_expense"]
+            self.add_data_to_table(data["category"], data["date"], str(data["amount"]))
 
     def create_top_frame(self):
         """
@@ -258,7 +273,7 @@ class MyApp(QWidget):
             percentage_spent = (self.total_expenses / self.total_income) * 100
         else:
             percentage_spent = 0
-        self.progress_bar.setValue(percentage_spent)
+        self.progress_bar.setValue(int(percentage_spent))  # Convert to int
         self.percentage_label.setText(f"{percentage_spent:.2f}%")
 
     def create_totals_container(self):
@@ -871,18 +886,18 @@ class MyApp(QWidget):
     def update_totals(self):
         # Refresh the totals container
         totals_container = self.create_totals_container()
-        self.layout().itemAt(1).itemAt(1).widget().layout().replaceWidget(
-            self.layout().itemAt(1).itemAt(1).widget(), totals_container
-        )
-        totals_container.show()
+        middle_frame_layout = self.layout().itemAt(1).widget().layout()
+        old_totals_container = middle_frame_layout.itemAt(1).widget()
+        middle_frame_layout.replaceWidget(old_totals_container, totals_container)
+        old_totals_container.deleteLater()
 
     def update_circular_chart(self):
         # Refresh the circular chart container
         circular_container = self.create_circular_container()
-        self.layout().itemAt(1).itemAt(2).widget().layout().replaceWidget(
-            self.layout().itemAt(1).itemAt(2).widget(), circular_container
-        )
-        circular_container.show()
+        middle_frame_layout = self.layout().itemAt(1).widget().layout()
+        old_circular_container = middle_frame_layout.itemAt(2).widget()
+        middle_frame_layout.replaceWidget(old_circular_container, circular_container)
+        old_circular_container.deleteLater()
 
     # Helper methods to show styled QMessageBox
     def show_message(self, title, text):
