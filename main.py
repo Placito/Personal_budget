@@ -784,7 +784,7 @@ class MyApp(QWidget):
         selected_row = self.table.currentRow()  # Get the row index of the selected row
 
         # Explicitly check if no row is selected
-        if selected_row == 0 or selected_row == -1:  
+        if selected_row == -1:  
             self.show_warning("No Selection", "Please select a row to delete.")
             return  # Exit the function early
 
