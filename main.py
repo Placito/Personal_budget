@@ -144,11 +144,11 @@ class MyApp(QWidget):
         # Create a horizontal layout to hold the crud_container and configurations_container
         horizontal_layout = QHBoxLayout()
 
-        # CRUD Container
+        # CRUD Container, for entering new expenses
         crud_container = self.create_crud_container("Enter new expenses:")
         horizontal_layout.addWidget(crud_container)
 
-        # Configurations Container
+        # Configurations Container, for entering new recipes
         configurations_container = self.create_configurations_container("Enter new recipes:")
         horizontal_layout.addWidget(configurations_container)
 
@@ -311,7 +311,7 @@ class MyApp(QWidget):
         table_label.setStyleSheet(f"font: bold 12px Verdana; color: {c0};")
         layout.addWidget(table_label)
 
-        self.table = QTableWidget(10, 4, self)  # Set self.table here
+        self.table = QTableWidget(0, 4, self)  # Set self.table here with 0 initial rows
         self.table.setHorizontalHeaderLabels(['ID', 'Item', 'Date', 'Amount'])
         self.table.setSelectionBehavior(QTableWidget.SelectRows)  # Allow row selection
 
@@ -324,6 +324,7 @@ class MyApp(QWidget):
 
         # Populate the QTableWidget
         for row_idx, row_data in enumerate(list_Items):
+            self.table.insertRow(row_idx)
             for col_idx, col_data in enumerate(row_data):
                 self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(col_data)))
 
@@ -656,9 +657,9 @@ class MyApp(QWidget):
         self.add_receipt_button = QPushButton("Add", self)
         self.add_receipt_button.clicked.connect(
             lambda: self.add_data_to_table(
-                category=self.input_category_config.text().strip(),
-                date=self.date_input.date().toString("yyyy-MM-dd"),
-                amount=self.input_total_amount.text().strip(),
+                category=self.input_category_configurations.currentText().strip(),
+                date=self.date_input_configurations.date().toString("yyyy-MM-dd"),
+                amount=self.input_total_amount_configurations.text().strip(),
             )
         )
 
@@ -685,21 +686,23 @@ class MyApp(QWidget):
 
     def set_receipt_mode(self):
         self.is_expense = False
+        self.clear_inputs()
         print("Receipt mode activated")
 
     def set_expense_mode(self):
         self.is_expense = True
+        self.clear_inputs()
         print("Expense mode activated")
 
     def add_data_to_table(self, category, date, amount):
         if not category or not amount:  # Check for empty inputs
-            QMessageBox.warning(self, "Missing Data", "Please fill out all fields.")
+            self.show_warning( "Missing Data", "Please fill out all fields.")
             return
 
         try:
             amount_value = float(amount)  # Convert amount to float
         except ValueError:
-            QMessageBox.warning(self, "Invalid Amount", "Amount must be a valid number.")
+            self.show_warning( "Invalid Amount", "Amount must be a valid number.")
             return
 
         # Determine if it's an expense (negative) or receipt (positive)
@@ -710,10 +713,7 @@ class MyApp(QWidget):
 
         # Optional: Clear inputs
         self.clear_inputs()
-        QMessageBox.information(self, "Success", "Data added to the table successfully.")
-
-        # Force Table Refresh
-        self.table.viewport().update()
+        self.show_message( "Success", "Data added to the table successfully.")
 
     def add_row_to_table(self, category, date, amount):
         print(f"Adding row: Category={category}, Date={date}, Amount={amount}")
@@ -724,15 +724,23 @@ class MyApp(QWidget):
         self.table.insertRow(row_count)
 
         # Add items to the respective columns
-        self.table.setItem(row_count, 0, QTableWidgetItem(category))
-        self.table.setItem(row_count, 1, QTableWidgetItem(date))
-        self.table.setItem(row_count, 2, QTableWidgetItem(amount))
+        self.table.setItem(row_count, 0, QTableWidgetItem(str(row_count + 1)))  # Assuming ID is row_count + 1
+        self.table.setItem(row_count, 1, QTableWidgetItem(category))
+        self.table.setItem(row_count, 2, QTableWidgetItem(date))
+        self.table.setItem(row_count, 3, QTableWidgetItem(amount))
+
+        # Adjust column widths to fit the content
+        self.table.resizeColumnsToContents()
+        self.table.resizeRowsToContents()  # Adjust row sizes
+
+        # Ensure the table is properly refreshed
+        self.table.scrollToBottom()
 
         print(f"Current row count after: {self.table.rowCount()}")  # Debugging row count after
 
     def clear_inputs(self):
-        self.input_category_crud.clear()
-        self.input_category_configurations.clear()
+        self.input_category_crud.setCurrentIndex(0)
+        self.input_category_configurations.setCurrentIndex(0)
         self.input_amount_crud.clear()
         self.input_total_amount_configurations.clear()
         self.date_input_crud.setDate(QDate.currentDate())
@@ -784,15 +792,19 @@ class MyApp(QWidget):
 
     def show_warning(self, title, text):
         msg = QMessageBox(self)
-        msg.setStyleSheet("QLabel { color: black; }")  # Ensure text is black
+        msg.setStyleSheet(
+            """
+            QLabel {
+                color: red;  /* Change this to your desired color */
+            }
+            """
+        )
         msg.setIcon(QMessageBox.Warning)
         msg.setWindowTitle(title)
         msg.setText(text)
         msg.exec_()
         
     def update_table(self):
-        """ Refresh the data shown in the table. """
-        # Clear existing rows
         self.table.setRowCount(0)
 
         # Fetch updated data from the database
