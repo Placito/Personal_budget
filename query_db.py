@@ -43,7 +43,7 @@ if __name__ == "__main__":
     print("\nExpenses:")
     view_table_data("Expenses")
 
-    # Add new values
-    add_category("Utilities")
-    add_recipe("Utilities", "2025-02-01", 150.0)
-    add_expense("Utilities", "2025-02-02", 75.0)
+    # Add new categories
+    categories = ["Travel", "Food", "Entertainment", "Rent", "Shopping", "Water", "Electricity", "Car", "Transportation"]
+    for category in categories:
+        add_category(category)

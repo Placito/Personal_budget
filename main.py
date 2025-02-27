@@ -35,8 +35,8 @@ class MyApp(QWidget):
         self.total_expenses = 0
         self.total_balance = 0
 
-        # Define categories and selected_categories
-        self.categories = ['Choose a category', 'Travel', 'Food', 'Entertainment', 'Shopping']
+        # Fetch categories from the database
+        self.categories = self.fetch_categories()
         self.selected_categories = []
 
         # Set up window
@@ -70,6 +70,11 @@ class MyApp(QWidget):
         # Set the main layout
         self.setLayout(layout)
         self.show()
+
+    def fetch_categories(self):
+        db = Database()
+        categories = db.fetchall_query("SELECT name FROM Category")
+        return ['Choose a category'] + [category['name'] for category in categories]
 
     def create_top_frame(self):
         """
