@@ -1,6 +1,7 @@
 import os
 import sys
 from PyQt5.QtCore import Qt, QDate
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame,
     QProgressBar, QTableWidget, QTableWidgetItem, QLineEdit, QDateEdit, QComboBox, QListWidget, QMessageBox, QPushButton
@@ -35,6 +36,7 @@ class MyApp(QWidget):
 
         # Set up window
         self.setWindowTitle("PyQt Example")
+        self.setWindowIcon(QIcon(os.path.join(os.path.dirname(__file__), "log.png")))
         self.setGeometry(0, 0, 800, 600)
         self.setStyleSheet(f"background-color: {c9};")
 
@@ -763,6 +765,7 @@ class MyApp(QWidget):
                 delete_recipe(item_id)  # Delete from the Recipes table
 
             # Remove the row from the table
+
             self.table.removeRow(selected_row)
 
             # Show a confirmation message

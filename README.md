@@ -1,40 +1,78 @@
 # Personal_budget
 
-This project aims to allow the user to enter their monthly expenses and organize this data. The program must calculate the total expenses, the average expenses per category and identify the largest and smallest expenses. in python
+    ## Overview
+
+    Personal_budget is a Python application designed to help users manage their personal finances by entering monthly expenses, organizing data, calculating total expenses, determining the average expenses per category, and identifying the largest and smallest expenses. This application uses PyQt5 for the graphical user interface (GUI) and SQLAlchemy with SQLite as the database.
 
 
-to create this app I use PyQt5 - `pip install PyQt5`
+    ## Features
 
-Alembic Migrations Guide
-This guide outlines the process of handling database migrations using Alembic for the Personal Budget project, specifically addressing SQLite limitations.
+    * Enter monthly expenses.
+    * Organize expenses by category.
+    * Calculate the total expenses.
+    * Find average expenses per category.
+    * Identify the largest and smallest expenses.
 
-1. Setting Up Alembic
-Initialize Alembic: `alembic init alembic`
+    ## Installation
 
-    1.1. Configure alembic.ini:
-        * Update the sqlalchemy.url to point to your database (e.g., sqlite:///dados.db).
+    Prerequisites
+        To run this application, you need Python 3 and pip installed on your machine.
 
-    1.2. Define your models in the project's models.py or equivalent.
+    1. Install Python 3
+    2. Install pip (Python package manager): pip is usually installed with Python. If not, you can install it following this guide.
+    
+    ## Installing Required Packages
+    The application uses PyQt5 for the UI and SQLAlchemy with Alembic for database migrations. You can install these dependencies by running the following command in your terminal:
 
-    1.3. Update alembic/env.py to include model imports and metadata: 
-        * `` from your_project.models import Base
-             target_metadata = Base.metadata ``
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-2. Creating and Applying Migrations
-Generate a New Migration
-2.1.  Create a migration script:
+    ## Setting Up the Database
 
-* ` alembic revision --autogenerate -m "migration_name" `
+    The database for this application uses SQLite, which is a lightweight database included with Python. To set up Alembic for handling database migrations:
 
-2.2 Review the migration file in alembic/versions/ for unsupported SQLite commands (e.g., ALTER TABLE):
+    1. Initialize Alembic: In your project directory, run the following command to initialize Alembic:
 
-* Unsupported Commands:
-    * ALTER TABLE
-    * Adding/removing columns
+    ```bash
+    alembic init alembic
+    ```
 
-* Workaround:
-    * Create a new table with the updated schema.
-    * Migrate data from the old table to the new table.
-    * Drop the old table and rename the new table.
-    * Apply Migrations
-    * Run migrations to apply schema changes: ` alembic upgrade head `
+    2. Configure Alembic: Update alembic.ini to point to your SQLite database. In the alembic.ini file, change the sqlalchemy.url setting to:
+
+    ```bash
+    sqlalchemy.url = sqlite:///dados.db
+    ```
+
+    ## Database Migrations with Alembic
+
+        1. Creating and Applying Migrations
+        Generate a New Migration
+       
+        ```bash
+        alembic revision --autogenerate -m "migration_name"
+        ```
+
+        2. Review the Migration Script
+        Review the migration script for any unsupported SQLite commands. Specifically, SQLite does not support ALTER TABLE for adding or removing columns.
+
+        3. Workaround for SQLite
+        Create a new table with the updated schema.
+        Migrate the data from the old table to the new table.
+        Drop the old table and rename the new table.
+
+        4. Apply the Migrations
+        To apply the migrations and update the database schema, run:
+
+        ```bash
+        alembic upgrade head
+        ```
+
+        ## Running the Application
+        To run the application, execute the following command:
+
+        ```bash
+        python main.py
+        ```
+
+
